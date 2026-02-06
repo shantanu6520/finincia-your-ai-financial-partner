@@ -6,8 +6,7 @@ import {
   Target, 
   Bell, 
   Lock,
-  Zap,
-  BarChart3
+  Zap
 } from "lucide-react";
 
 const features = [
@@ -31,11 +30,6 @@ const features = [
     icon: Target,
     title: "Goal-Based Savings",
     description: "Set financial goals—emergency fund, vacation, home—and get a realistic plan to achieve them.",
-  },
-  {
-    icon: BarChart3,
-    title: "Investment Guidance",
-    description: "Understand what to invest based on your risk profile, goals, and current financial health.",
   },
   {
     icon: Bell,
