@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import fininciaLogo from "@/assets/finincia-logo.png";
 
 const navLinks = [
   { label: "Features", href: "#features" },
@@ -28,30 +29,31 @@ const Navbar = () => {
       transition={{ duration: 0.5 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? "bg-background/80 backdrop-blur-xl border-b border-border shadow-sm" 
+          ? "bg-background/95 backdrop-blur-xl border-b border-border shadow-sm" 
           : "bg-transparent"
       }`}
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
-              <span className="font-display font-bold text-accent-foreground text-lg">F</span>
-            </div>
-            <span className={`font-display font-bold text-xl ${isScrolled ? 'text-foreground' : 'text-primary-foreground'}`}>
-              FININCIA
-            </span>
+          <a href="/" className="flex items-center">
+            <img 
+              src={fininciaLogo} 
+              alt="FININCIA" 
+              className={`h-8 md:h-10 w-auto transition-all ${
+                isScrolled ? 'invert' : ''
+              }`}
+            />
           </a>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-10">
             {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className={`text-sm font-medium transition-colors hover:text-accent ${
-                  isScrolled ? 'text-muted-foreground' : 'text-primary-foreground/80'
+                className={`text-sm font-medium tracking-wide uppercase transition-colors hover:opacity-70 ${
+                  isScrolled ? 'text-foreground' : 'text-primary-foreground/90'
                 }`}
               >
                 {link.label}
@@ -60,15 +62,26 @@ const Navbar = () => {
           </div>
 
           {/* CTA Buttons */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-4">
             <Button 
-              variant={isScrolled ? "ghost" : "heroOutline"} 
+              variant="ghost" 
               size="sm"
-              className={!isScrolled ? 'border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10' : ''}
+              className={`font-medium tracking-wide ${
+                isScrolled 
+                  ? 'text-foreground hover:bg-secondary' 
+                  : 'text-primary-foreground hover:bg-primary-foreground/10'
+              }`}
             >
               Log In
             </Button>
-            <Button variant="accent" size="sm">
+            <Button 
+              size="sm"
+              className={`font-medium tracking-wide ${
+                isScrolled
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                  : 'bg-primary-foreground text-primary hover:bg-primary-foreground/90'
+              }`}
+            >
               Get Started
             </Button>
           </div>
@@ -92,24 +105,24 @@ const Navbar = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="md:hidden py-4 border-t border-border"
+            className="md:hidden py-6 border-t border-border bg-background"
           >
             <div className="flex flex-col gap-4">
               {navLinks.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
-                  className="text-foreground hover:text-accent transition-colors py-2"
+                  className="text-foreground hover:opacity-70 transition-opacity py-2 text-sm uppercase tracking-wide"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.label}
                 </a>
               ))}
-              <div className="flex flex-col gap-2 pt-4 border-t border-border">
+              <div className="flex flex-col gap-3 pt-6 border-t border-border">
                 <Button variant="outline" className="w-full">
                   Log In
                 </Button>
-                <Button variant="accent" className="w-full">
+                <Button className="w-full bg-primary text-primary-foreground">
                   Get Started
                 </Button>
               </div>

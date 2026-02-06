@@ -50,7 +50,7 @@ const features = [
 
 const FeaturesSection = () => {
   return (
-    <section className="py-24 bg-background">
+    <section className="py-28 bg-background">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -59,12 +59,12 @@ const FeaturesSection = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <span className="inline-block px-4 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-medium mb-4">
+          <span className="inline-block px-4 py-1.5 text-sm font-medium tracking-wider uppercase text-muted-foreground mb-6">
             Features
           </span>
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-6">
             Everything You Need to{" "}
-            <span className="text-gradient-accent">Take Control</span>
+            <span className="italic">Take Control</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Not just another expense tracker. A complete financial operating system designed for Indian professionals.
@@ -79,23 +79,23 @@ const FeaturesSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.05 }}
-              className={`group relative rounded-2xl p-6 transition-all duration-300 ${
+              className={`group relative rounded-lg p-6 transition-all duration-300 ${
                 feature.highlight 
-                  ? 'bg-gradient-to-br from-accent/10 via-accent/5 to-transparent border-2 border-accent/20 shadow-glow md:col-span-2' 
-                  : 'bg-card border border-border hover:border-accent/30 shadow-card hover:shadow-lg'
+                  ? 'bg-primary text-primary-foreground md:col-span-2' 
+                  : 'bg-card border border-border hover:border-foreground/20'
               }`}
             >
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors ${
+              <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 transition-colors ${
                 feature.highlight 
-                  ? 'bg-accent text-accent-foreground' 
-                  : 'bg-secondary group-hover:bg-accent/10'
+                  ? 'bg-primary-foreground/10' 
+                  : 'bg-secondary group-hover:bg-foreground/5'
               }`}>
-                <feature.icon className={`w-6 h-6 ${feature.highlight ? '' : 'text-accent'}`} />
+                <feature.icon className={`w-5 h-5 ${feature.highlight ? 'text-primary-foreground' : 'text-foreground/70'}`} />
               </div>
-              <h3 className={`font-display font-semibold mb-2 ${feature.highlight ? 'text-xl' : 'text-lg'} text-foreground`}>
+              <h3 className={`font-display font-semibold mb-2 ${feature.highlight ? 'text-xl text-primary-foreground' : 'text-lg text-foreground'}`}>
                 {feature.title}
               </h3>
-              <p className={`text-muted-foreground leading-relaxed ${feature.highlight ? 'text-base' : 'text-sm'}`}>
+              <p className={`leading-relaxed ${feature.highlight ? 'text-primary-foreground/80' : 'text-muted-foreground text-sm'}`}>
                 {feature.description}
               </p>
             </motion.div>

@@ -72,7 +72,7 @@ export default {
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['Playfair Display', 'Georgia', 'serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -97,8 +97,8 @@ export default {
           "50%": { transform: "translateY(-10px)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 20px hsl(160 84% 39% / 0.2)" },
-          "50%": { boxShadow: "0 0 40px hsl(160 84% 39% / 0.4)" },
+          "0%, 100%": { boxShadow: "0 0 20px hsl(0 0% 50% / 0.15)" },
+          "50%": { boxShadow: "0 0 40px hsl(0 0% 50% / 0.25)" },
         },
       },
       animation: {
