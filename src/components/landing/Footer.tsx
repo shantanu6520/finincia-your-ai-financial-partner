@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
 import { Mail, Twitter, Linkedin, Instagram } from "lucide-react";
+import fininciaLogo from "@/assets/finincia-logo.png";
 
 const footerLinks = {
   product: [
@@ -30,20 +30,19 @@ const socialLinks = [
 
 const Footer = () => {
   return (
-    <footer className="bg-secondary/50 border-t border-border">
-      <div className="container mx-auto px-4 py-16">
+    <footer className="bg-primary text-primary-foreground">
+      <div className="container mx-auto px-4 py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
-                <span className="font-display font-bold text-accent-foreground text-lg">F</span>
-              </div>
-              <span className="font-display font-bold text-xl text-foreground">
-                FININCIA
-              </span>
+            <div className="mb-6">
+              <img 
+                src={fininciaLogo} 
+                alt="FININCIA" 
+                className="h-10 w-auto"
+              />
             </div>
-            <p className="text-muted-foreground mb-6 max-w-sm">
+            <p className="text-primary-foreground/70 mb-8 max-w-sm leading-relaxed">
               Your AI-powered personal CFO. Take control of your finances with intelligent insights 
               designed for Indian professionals.
             </p>
@@ -52,10 +51,10 @@ const Footer = () => {
                 <a
                   key={social.label}
                   href={social.href}
-                  className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-accent hover:bg-accent/10 transition-all"
+                  className="w-10 h-10 rounded-full border border-primary-foreground/20 flex items-center justify-center text-primary-foreground/70 hover:text-primary-foreground hover:border-primary-foreground/50 transition-all"
                   aria-label={social.label}
                 >
-                  <social.icon className="w-5 h-5" />
+                  <social.icon className="w-4 h-4" />
                 </a>
               ))}
             </div>
@@ -63,13 +62,13 @@ const Footer = () => {
 
           {/* Product Links */}
           <div>
-            <h4 className="font-display font-semibold text-foreground mb-4">Product</h4>
-            <ul className="space-y-3">
+            <h4 className="font-display text-sm uppercase tracking-wider text-primary-foreground/50 mb-6">Product</h4>
+            <ul className="space-y-4">
               {footerLinks.product.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="text-muted-foreground hover:text-accent transition-colors"
+                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
                   >
                     {link.label}
                   </a>
@@ -80,13 +79,13 @@ const Footer = () => {
 
           {/* Company Links */}
           <div>
-            <h4 className="font-display font-semibold text-foreground mb-4">Company</h4>
-            <ul className="space-y-3">
+            <h4 className="font-display text-sm uppercase tracking-wider text-primary-foreground/50 mb-6">Company</h4>
+            <ul className="space-y-4">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="text-muted-foreground hover:text-accent transition-colors"
+                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
                   >
                     {link.label}
                   </a>
@@ -97,13 +96,13 @@ const Footer = () => {
 
           {/* Legal Links */}
           <div>
-            <h4 className="font-display font-semibold text-foreground mb-4">Legal</h4>
-            <ul className="space-y-3">
+            <h4 className="font-display text-sm uppercase tracking-wider text-primary-foreground/50 mb-6">Legal</h4>
+            <ul className="space-y-4">
               {footerLinks.legal.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="text-muted-foreground hover:text-accent transition-colors"
+                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
                   >
                     {link.label}
                   </a>
@@ -114,12 +113,12 @@ const Footer = () => {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-16 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-muted-foreground text-sm">
+        <div className="mt-20 pt-8 border-t border-primary-foreground/10 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-primary-foreground/50 text-sm">
             © 2024 FININCIA. All rights reserved.
           </p>
-          <p className="text-muted-foreground text-sm">
-            Made with ❤️ for Indian professionals
+          <p className="text-primary-foreground/50 text-sm">
+            Made with precision for Indian professionals
           </p>
         </div>
       </div>

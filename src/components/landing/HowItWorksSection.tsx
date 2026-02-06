@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
-import { Link2, Brain, TrendingUp, Repeat } from "lucide-react";
+import { Wallet, Brain, TrendingUp, Repeat } from "lucide-react";
 
 const steps = [
   {
     number: "01",
-    icon: Link2,
+    icon: Wallet,
     title: "Add Your Finances",
     description: "Quickly add your wallets, income, and expenses manually. Your data stays private—no bank linking required.",
   },
@@ -30,9 +30,9 @@ const steps = [
 
 const HowItWorksSection = () => {
   return (
-    <section className="py-24 bg-hero relative overflow-hidden">
+    <section className="py-28 bg-primary relative overflow-hidden">
       {/* Background elements */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:80px_80px]" />
       
       <div className="container mx-auto px-4 relative">
         <motion.div
@@ -42,13 +42,13 @@ const HowItWorksSection = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <span className="inline-block px-4 py-1.5 rounded-full bg-accent/20 text-accent text-sm font-medium mb-4">
+          <span className="inline-block px-4 py-1.5 text-sm font-medium tracking-wider uppercase text-primary-foreground/50 mb-6">
             How It Works
           </span>
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-primary-foreground mb-4">
+          <h2 className="font-display text-4xl md:text-5xl font-bold text-primary-foreground mb-6">
             From Financial Chaos to Clarity
           </h2>
-          <p className="text-xl text-primary-foreground/70 max-w-2xl mx-auto">
+          <p className="text-xl text-primary-foreground/60 max-w-2xl mx-auto">
             Get started in minutes. See results in days.
           </p>
         </motion.div>
@@ -65,17 +65,17 @@ const HowItWorksSection = () => {
             >
               {/* Connector line */}
               {index < steps.length - 1 && (
-                <div className="hidden lg:block absolute top-16 left-[60%] w-[80%] h-px bg-gradient-to-r from-accent/50 to-transparent" />
+                <div className="hidden lg:block absolute top-16 left-[60%] w-[80%] h-px bg-gradient-to-r from-primary-foreground/20 to-transparent" />
               )}
               
-              <div className="relative bg-card/10 backdrop-blur-sm rounded-2xl p-6 border border-primary-foreground/10 hover:border-accent/30 transition-all duration-300">
+              <div className="relative bg-primary-foreground/5 backdrop-blur-sm rounded-lg p-6 border border-primary-foreground/10 hover:border-primary-foreground/20 transition-all duration-300">
                 {/* Step number */}
-                <span className="absolute -top-3 -left-3 w-10 h-10 rounded-full bg-accent flex items-center justify-center font-display font-bold text-accent-foreground text-sm">
+                <span className="absolute -top-3 -left-3 w-10 h-10 rounded-full bg-primary-foreground text-primary flex items-center justify-center font-display font-bold text-sm">
                   {step.number}
                 </span>
                 
-                <div className="w-14 h-14 rounded-2xl bg-accent/20 flex items-center justify-center mb-4 mt-2">
-                  <step.icon className="w-7 h-7 text-accent" />
+                <div className="w-14 h-14 rounded-lg bg-primary-foreground/10 flex items-center justify-center mb-4 mt-2">
+                  <step.icon className="w-6 h-6 text-primary-foreground/80" />
                 </div>
                 
                 <h3 className="font-display text-xl font-semibold text-primary-foreground mb-2">

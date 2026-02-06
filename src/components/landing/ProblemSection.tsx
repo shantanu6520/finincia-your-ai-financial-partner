@@ -26,7 +26,7 @@ const problems = [
 
 const ProblemSection = () => {
   return (
-    <section className="py-24 bg-secondary/30">
+    <section className="py-28 bg-secondary/50">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -35,10 +35,10 @@ const ProblemSection = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <span className="inline-block px-4 py-1.5 rounded-full bg-destructive/10 text-destructive text-sm font-medium mb-4">
+          <span className="inline-block px-4 py-1.5 text-sm font-medium tracking-wider uppercase text-muted-foreground mb-6">
             The Problem
           </span>
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-6">
             Managing Money Shouldn't Be This Hard
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -54,11 +54,11 @@ const ProblemSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="group relative bg-card rounded-2xl p-6 border border-border hover:border-destructive/30 transition-all duration-300 shadow-card hover:shadow-lg"
+              className="group relative bg-card rounded-lg p-6 border border-border hover:border-foreground/20 transition-all duration-300"
             >
               <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center group-hover:bg-destructive/20 transition-colors">
-                  <problem.icon className="w-6 h-6 text-destructive" />
+                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-secondary flex items-center justify-center group-hover:bg-foreground/5 transition-colors">
+                  <problem.icon className="w-5 h-5 text-foreground/70" />
                 </div>
                 <div>
                   <h3 className="font-display text-lg font-semibold text-foreground mb-2">
@@ -78,9 +78,9 @@ const ProblemSection = () => {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-center mt-12 text-lg text-muted-foreground"
+          className="text-center mt-16 text-lg text-muted-foreground"
         >
-          Sound familiar? <span className="text-accent font-semibold">There's a better way.</span>
+          Sound familiar? <span className="text-foreground font-semibold">There's a better way.</span>
         </motion.p>
       </div>
     </section>
