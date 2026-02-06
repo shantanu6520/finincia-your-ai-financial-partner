@@ -5,8 +5,8 @@ const steps = [
   {
     number: "01",
     icon: Link2,
-    title: "Connect Securely",
-    description: "Link your bank accounts and credit cards with read-only access. We use bank-grade encryption.",
+    title: "Add Your Finances",
+    description: "Quickly add your wallets, income, and expenses manually. Your data stays private—no bank linking required.",
   },
   {
     number: "02",
