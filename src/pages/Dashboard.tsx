@@ -196,12 +196,12 @@ const Dashboard = () => {
                     <AreaChart data={chartData}>
                       <defs>
                         <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--foreground))" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="hsl(var(--foreground))" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="hsl(142, 76%, 36%)" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="hsl(142, 76%, 36%)" stopOpacity={0}/>
                         </linearGradient>
                         <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--muted-foreground))" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="hsl(var(--muted-foreground))" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="hsl(0, 84%, 60%)" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="hsl(0, 84%, 60%)" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
                       <XAxis 
@@ -227,7 +227,8 @@ const Dashboard = () => {
                       <Area
                         type="monotone"
                         dataKey="income"
-                        stroke="hsl(var(--foreground))"
+                        stroke="hsl(142, 76%, 36%)"
+                        strokeWidth={2}
                         fillOpacity={1}
                         fill="url(#incomeGradient)"
                         name="Income"
@@ -235,7 +236,8 @@ const Dashboard = () => {
                       <Area
                         type="monotone"
                         dataKey="expenses"
-                        stroke="hsl(var(--muted-foreground))"
+                        stroke="hsl(0, 84%, 60%)"
+                        strokeWidth={2}
                         fillOpacity={1}
                         fill="url(#expenseGradient)"
                         name="Expenses"
