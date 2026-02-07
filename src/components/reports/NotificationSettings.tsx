@@ -121,6 +121,12 @@ const NotificationSettings = ({ profile, onSave, isUpdating }: NotificationSetti
                   </li>
                 </ul>
               </div>
+
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
+                <p className="text-sm text-amber-600 dark:text-amber-400">
+                  <strong>Coming Soon:</strong> WhatsApp integration is being configured. Your preferences will be saved and you'll be notified when the service is ready.
+                </p>
+              </div>
             </motion.div>
           )}
         </CardContent>
