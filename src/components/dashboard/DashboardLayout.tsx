@@ -9,7 +9,9 @@ import {
   LogOut, 
   Menu, 
   X,
-  ChevronRight
+  ChevronRight,
+  PieChart,
+  Target
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -24,6 +26,8 @@ const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
   { icon: Wallet, label: "Wallets", path: "/wallets" },
   { icon: Receipt, label: "Transactions", path: "/transactions" },
+  { icon: PieChart, label: "Budgets", path: "/budgets" },
+  { icon: Target, label: "Goals", path: "/goals" },
   { icon: User, label: "Profile", path: "/profile" },
 ];
 
