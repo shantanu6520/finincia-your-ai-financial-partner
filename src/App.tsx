@@ -10,6 +10,8 @@ import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import Wallets from "./pages/Wallets";
 import Transactions from "./pages/Transactions";
+import Budgets from "./pages/Budgets";
+import Goals from "./pages/Goals";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "@/components/dashboard/ProtectedRoute";
@@ -48,6 +50,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Transactions />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/budgets"
+              element={
+                <ProtectedRoute>
+                  <Budgets />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/goals"
+              element={
+                <ProtectedRoute>
+                  <Goals />
                 </ProtectedRoute>
               }
             />
