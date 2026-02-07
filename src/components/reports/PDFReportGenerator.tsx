@@ -18,11 +18,25 @@ const PDFReportGenerator = ({ reviewData, currency = "INR", userName }: PDFRepor
   const currencySymbol = currency === 'INR' ? '₹' : '$';
 
   const generatePDFContent = () => {
+    // Choose data based on report type
+    const isMonthly = reportType === "monthly";
+    const periodData = isMonthly 
+      ? {
+          current: reviewData.monthlyComparison.currentMonth,
+          changes: reviewData.monthlyComparison.changes,
+          label: reviewData.monthLabel,
+        }
+      : {
+          current: reviewData.quarterComparison.currentQuarter,
+          changes: reviewData.quarterComparison.changes,
+          label: reviewData.quarterLabel,
+        };
+
     return `
       <!DOCTYPE html>
       <html>
       <head>
-        <title>FININCIA ${reportType === "quarterly" ? "Quarterly" : "Monthly"} Financial Report</title>
+        <title>FININCIA ${isMonthly ? "Monthly" : "Quarterly"} Financial Report</title>
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
           body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1a1a1a; line-height: 1.6; background: #fff; }
@@ -73,8 +87,8 @@ const PDFReportGenerator = ({ reviewData, currency = "INR", userName }: PDFRepor
               <div class="logo-tagline">Your AI-Powered Financial CFO</div>
             </div>
             <div class="header-meta">
-              <p style="font-size: 16px; font-weight: 600; color: #333;">${reportType === "quarterly" ? "Quarterly" : "Monthly"} Financial Review</p>
-              <p>${reviewData.quarterLabel}</p>
+              <p style="font-size: 16px; font-weight: 600; color: #333;">${isMonthly ? "Monthly" : "Quarterly"} Financial Review</p>
+              <p>${periodData.label}</p>
               ${userName ? `<p>Prepared for: <strong>${userName}</strong></p>` : ''}
               <p>Generated: ${reviewData.generatedAt}</p>
             </div>
@@ -108,29 +122,29 @@ const PDFReportGenerator = ({ reviewData, currency = "INR", userName }: PDFRepor
           </div>
 
           <div class="section">
-            <div class="section-title">📈 ${reportType === "quarterly" ? "Quarterly" : "Monthly"} Performance</div>
+            <div class="section-title">📈 ${isMonthly ? "Monthly" : "Quarterly"} Performance</div>
             <div class="grid">
               <div class="stat-card">
                 <div class="stat-label">Total Income</div>
-                <div class="stat-value">${currencySymbol}${reviewData.quarterComparison.currentQuarter.income.toLocaleString()}</div>
-                <div class="stat-change" style="color: ${reviewData.quarterComparison.changes.income >= 0 ? '#10b981' : '#ef4444'}">
-                  ${reviewData.quarterComparison.changes.income >= 0 ? '↑' : '↓'} ${Math.abs(reviewData.quarterComparison.changes.income).toFixed(1)}% vs last period
+                <div class="stat-value">${currencySymbol}${periodData.current.income.toLocaleString()}</div>
+                <div class="stat-change" style="color: ${periodData.changes.income >= 0 ? '#10b981' : '#ef4444'}">
+                  ${periodData.changes.income >= 0 ? '↑' : '↓'} ${Math.abs(periodData.changes.income).toFixed(1)}% vs last ${isMonthly ? 'month' : 'quarter'}
                 </div>
               </div>
               <div class="stat-card">
                 <div class="stat-label">Total Expenses</div>
-                <div class="stat-value">${currencySymbol}${reviewData.quarterComparison.currentQuarter.expenses.toLocaleString()}</div>
-                <div class="stat-change" style="color: ${reviewData.quarterComparison.changes.expenses <= 0 ? '#10b981' : '#ef4444'}">
-                  ${reviewData.quarterComparison.changes.expenses >= 0 ? '↑' : '↓'} ${Math.abs(reviewData.quarterComparison.changes.expenses).toFixed(1)}% vs last period
+                <div class="stat-value">${currencySymbol}${periodData.current.expenses.toLocaleString()}</div>
+                <div class="stat-change" style="color: ${periodData.changes.expenses <= 0 ? '#10b981' : '#ef4444'}">
+                  ${periodData.changes.expenses >= 0 ? '↑' : '↓'} ${Math.abs(periodData.changes.expenses).toFixed(1)}% vs last ${isMonthly ? 'month' : 'quarter'}
                 </div>
               </div>
               <div class="stat-card">
                 <div class="stat-label">Net Savings</div>
-                <div class="stat-value" style="color: ${reviewData.quarterComparison.currentQuarter.savings >= 0 ? '#10b981' : '#ef4444'}">${currencySymbol}${reviewData.quarterComparison.currentQuarter.savings.toLocaleString()}</div>
+                <div class="stat-value" style="color: ${periodData.current.savings >= 0 ? '#10b981' : '#ef4444'}">${currencySymbol}${periodData.current.savings.toLocaleString()}</div>
               </div>
               <div class="stat-card">
                 <div class="stat-label">Savings Rate</div>
-                <div class="stat-value">${reviewData.quarterComparison.currentQuarter.savingsRate.toFixed(1)}%</div>
+                <div class="stat-value">${periodData.current.savingsRate.toFixed(1)}%</div>
               </div>
             </div>
           </div>
