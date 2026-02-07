@@ -129,11 +129,11 @@ const BillNegotiation = () => {
               <div className="p-2 bg-purple-500/10 rounded-xl">
                 <Receipt className="w-6 h-6 text-purple-500" />
               </div>
-              Bill Negotiation
+              Recurring Spend Optimizer
               <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">PRO</span>
             </h1>
             <p className="text-muted-foreground mt-1">
-              Reduce recurring bills with AI-powered negotiation scripts
+              Optimize recurring expenses with AI-powered analysis & negotiation scripts
             </p>
           </div>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -370,10 +370,10 @@ const BillNegotiation = () => {
           {/* AI Negotiation Panel */}
           <Card className="h-[600px] flex flex-col">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary" />
-                AI Negotiation Assistant
-              </CardTitle>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              AI Recurring Spend Analyst
+            </CardTitle>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col overflow-hidden p-4 pt-0">
               <div className="flex-1 overflow-y-auto space-y-3 mb-4">

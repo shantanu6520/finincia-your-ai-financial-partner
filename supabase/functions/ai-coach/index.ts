@@ -705,6 +705,346 @@ Fix: Discuss money with spouse/family regularly`
   }
 ];
 
+// ============================================
+// RAG KNOWLEDGE BASE - Recurring Spend Optimization
+// ============================================
+
+const billKnowledgeBase: KnowledgeChunk[] = [
+  {
+    id: "subscription_audit",
+    category: "optimization",
+    keywords: ["subscription", "audit", "cancel", "unused", "review", "subscriptions", "streaming", "ott"],
+    title: "Subscription Audit Strategy",
+    content: `Regular subscription audits can save ₹10-30K annually:
+
+**Monthly Audit Process:**
+1. List ALL subscriptions (streaming, apps, magazines, gym, cloud storage)
+2. Check last usage date for each
+3. Calculate annual cost per subscription
+4. Rate value: Essential / Nice-to-have / Unused
+
+**Common Hidden Subscriptions:**
+- App store auto-renewals
+- Free trials that converted
+- Annual renewals forgotten
+- Family plans with unused seats
+
+**Decision Framework:**
+- Used weekly → Keep
+- Used monthly → Evaluate if cheaper alternative exists
+- Not used in 30 days → Cancel immediately
+
+**Indian Context:** Average household has 5-8 subscriptions = ₹3,000-8,000/month potential savings.`
+  },
+  {
+    id: "negotiation_timing",
+    category: "negotiation",
+    keywords: ["when to negotiate", "best time", "timing", "renewal", "call", "leverage"],
+    title: "Optimal Negotiation Timing",
+    content: `Timing your negotiation maximizes success rate:
+
+**Best Times to Negotiate:**
+1. **End of billing cycle** - Providers want to retain before renewal
+2. **End of quarter** - Sales teams have targets to meet
+3. **After competitor offers** - Use as leverage
+4. **After service issues** - Goodwill credits available
+5. **Customer anniversaries** - Loyalty rewards time
+
+**Day/Time Tips:**
+- Call Tuesday-Thursday (less busy)
+- Morning hours (fresh agents, shorter queues)
+- Avoid month-end (high call volumes)
+
+**Preparation Checklist:**
+✅ Know your account tenure
+✅ Have competitor pricing ready
+✅ Note any service issues faced
+✅ Calculate total spent with provider
+✅ Know exact plan details and current rate`
+  },
+  {
+    id: "phone_negotiation_script",
+    category: "scripts",
+    keywords: ["phone script", "call script", "what to say", "telephone", "negotiation script", "talk"],
+    title: "Phone Negotiation Master Script",
+    content: `Proven phone negotiation framework:
+
+**Opening:**
+"Hi, I'm [Name], account number [X]. I've been a customer for [tenure] and I'm reviewing my bills. I'd like to discuss my plan pricing."
+
+**Building Leverage:**
+"I've really enjoyed your service, but I've received offers from [competitor] at [lower price]. I'd prefer to stay with you if we can work something out."
+
+**If Initial Offer Rejected:**
+"I understand. Is there a supervisor or retention department I could speak with? I want to make sure I explore all options before making a decision."
+
+**Retention Department Script:**
+"I'm considering switching to [competitor] because of price. What can you offer to keep me as a customer? I'm looking for at least [X]% reduction."
+
+**Closing:**
+"That works for me. Can you confirm this in writing/email? What's my new monthly amount and when does it take effect?"
+
+**Power Phrases:**
+- "What's the best you can do?"
+- "I'd hate to leave after being a loyal customer"
+- "What retention offers are available?"
+- "Can you match this competitor offer?"`
+  },
+  {
+    id: "email_negotiation_template",
+    category: "scripts",
+    keywords: ["email", "email template", "written", "letter", "formal", "escalation"],
+    title: "Email Negotiation Templates",
+    content: `Professional email templates for bill reduction:
+
+**Template 1: Initial Request**
+Subject: Long-term Customer Seeking Plan Review - Account [Number]
+
+Dear [Provider] Team,
+
+I've been a valued customer for [X years/months] and have always appreciated your service. I'm currently reviewing my monthly expenses and noticed my [service] bill of ₹[amount] is higher than comparable market rates.
+
+I've received offers from competitors at ₹[lower amount] for similar service. Before making any changes, I wanted to reach out to discuss retention offers or plan optimizations.
+
+Could you please review my account and suggest:
+1. Any available discounts or promotions
+2. Alternative plans with better value
+3. Loyalty benefits I may qualify for
+
+I'd prefer to continue our relationship if we can reach a mutually beneficial arrangement.
+
+Best regards,
+[Your Name]
+Account: [Number]
+Phone: [Number]
+
+**Template 2: Escalation Email**
+Subject: Escalation Request - Unsatisfactory Resolution - Account [Number]
+
+After [X] years as a customer spending over ₹[total amount], I'm disappointed that my rate reduction request was declined. I'm formally requesting this be escalated to a supervisor.
+
+[Include previous correspondence summary]
+
+If we cannot reach a resolution, I will be forced to explore alternatives effective [date].`
+  },
+  {
+    id: "streaming_optimization",
+    category: "category_specific",
+    keywords: ["netflix", "amazon", "prime", "hotstar", "streaming", "ott", "disney", "zee5", "sonyliv"],
+    title: "Streaming Service Optimization",
+    content: `Optimize OTT subscriptions in India:
+
+**Rotation Strategy:**
+Instead of all subscriptions simultaneously:
+- Month 1-2: Netflix (binge-watch list)
+- Month 3-4: Prime Video (different content)
+- Month 5-6: Hotstar (sports season)
+- Repeat cycle
+
+**Annual vs Monthly:**
+- Netflix: ₹199/month vs ₹149/month (annual mobile plan)
+- Prime: ₹1,499/year >>> ₹179/month (huge annual savings)
+- Hotstar: ₹299/month vs ₹899/year (Annual saves 75%)
+
+**Family/Group Plans:**
+- Netflix Premium (4 screens) - Split with 3 others = ₹150/person
+- Spotify Family (6 members) - ₹199 total vs ₹119 individual
+- YouTube Premium Family - Split cost significantly
+
+**Hidden Bundles:**
+- Airtel/Jio plans often include Disney+ Hotstar free
+- Amazon Prime includes Prime Video, Music, Shopping benefits
+- Vi postpaid includes Netflix on some plans
+
+**Savings Potential:** ₹3,000-6,000/year by optimizing streaming alone.`
+  },
+  {
+    id: "insurance_negotiation",
+    category: "category_specific",
+    keywords: ["insurance", "premium", "health insurance", "car insurance", "motor", "life insurance", "renewal"],
+    title: "Insurance Premium Negotiation",
+    content: `Insurance renewal negotiation strategies:
+
+**Health Insurance:**
+- Get quotes from 3+ insurers before renewal
+- Highlight claim-free years (no-claim bonus)
+- Ask about wellness program discounts
+- Consider increasing deductible to lower premium
+- Review coverage for unused features
+
+**Motor Insurance:**
+- No-claim bonus (NCB) can reduce premium by 20-50%
+- Anti-theft device discounts (5-10%)
+- Voluntary deductible reduces premium
+- Compare online vs agent prices
+- Transfer NCB when switching insurers
+
+**Negotiation Points:**
+"I've been claim-free for [X] years. What loyalty discount applies?"
+"This competitor is offering ₹[X] for same coverage. Can you match?"
+"I'm willing to increase my deductible for a lower premium."
+
+**Important:**
+- Never let policy lapse (lose NCB)
+- Renewal notice comes 30 days before - use this time
+- Online renewals often 5-10% cheaper than offline
+
+**Average Savings:** 15-25% on renewals by shopping around.`
+  },
+  {
+    id: "telecom_negotiation",
+    category: "category_specific",
+    keywords: ["phone", "mobile", "airtel", "jio", "vi", "vodafone", "internet", "broadband", "wifi", "postpaid"],
+    title: "Telecom & Internet Bill Reduction",
+    content: `Telecom negotiation specific strategies:
+
+**Mobile Plans:**
+- Prepaid often cheaper than postpaid for same data
+- Annual prepaid plans save 15-20% vs monthly
+- Family plans: Jio Family, Airtel Family plans
+- Corporate/employee discounts (ask HR)
+
+**Broadband Negotiation:**
+"I've been paying ₹[X] for [speed]. I see new customers get [higher speed] for same price. Can you upgrade me?"
+
+**Retention Triggers for Telecom:**
+- Port-out threat (works every time in India)
+- Competitor pricing comparison
+- Service quality complaints
+- Long customer tenure
+
+**What to Ask For:**
+1. Speed upgrade at same price
+2. Additional data/benefits
+3. Waiver of installation/router charges
+4. Contract buyout from competitor
+
+**Timing:**
+- End of contract is best leverage point
+- New plan launches = negotiate for better deal
+- Festive seasons often have retention offers
+
+**Script:**
+"I'm getting a better offer from [competitor] and considering porting out. What can you offer to retain me?"
+
+**Expected Outcome:** 10-30% reduction or significant upgrades.`
+  },
+  {
+    id: "utility_optimization",
+    category: "category_specific",
+    keywords: ["electricity", "water", "gas", "utility", "bijli", "power", "reduce bill"],
+    title: "Utility Bill Optimization",
+    content: `Reduce electricity and utility costs:
+
+**Electricity Optimization:**
+1. **Rate Analysis:** Check if you're on optimal slab
+   - Some states have ToD (Time of Day) rates - run heavy appliances during off-peak
+2. **Star Ratings:** 5-star rated appliances save 20-40% power
+3. **AC Efficiency:** Each degree higher = 3-5% savings. 24-25°C is optimal
+4. **LED Transition:** LED vs CFL vs incandescent can reduce lighting costs by 75%
+
+**Quick Wins:**
+- Switch off at plug (standby power costs ₹1,000-2,000/year)
+- Solar water heater ROI in 2-3 years
+- Smart plugs for scheduling
+
+**Water Bill:**
+- Fix leaks immediately (dripping tap = 15,000L/year wasted)
+- Low-flow fixtures reduce by 40-60%
+
+**Gas/LPG:**
+- Pressure cooker saves 70% fuel
+- Regulate flame (blue flame = efficient)
+- Annual servicing maintains efficiency
+
+**Government Subsidies:**
+- Check for energy-efficient appliance subsidies
+- Solar panel subsidies in many states
+
+**Monthly Savings Potential:** ₹500-2,000 on utilities.`
+  },
+  {
+    id: "gym_membership",
+    category: "category_specific",
+    keywords: ["gym", "fitness", "membership", "cult", "gym membership", "workout"],
+    title: "Gym & Fitness Membership Optimization",
+    content: `Gym membership negotiation strategies:
+
+**Best Times to Negotiate:**
+- January (New Year resolution rush - they're flexible)
+- August-September (before festive season slowdown)
+- End of quarter (sales targets)
+- When they're offering promotions (stack discounts)
+
+**Negotiation Points:**
+1. "I can pay annually upfront for a discount"
+2. "Can you waive the registration fee?"
+3. "I'll bring a friend if you give us both a deal"
+4. "What's your corporate rate? My company may be interested"
+
+**Alternative Options:**
+- Cult.fit: Pay-per-class vs unlimited (calculate which is cheaper)
+- Society gym: Often ₹500-1000/month
+- Apartment complex gym: Usually included in maintenance
+- Outdoor/home workout (₹0)
+
+**Red Flags to Avoid:**
+- Long lock-in contracts
+- Hidden annual maintenance fees
+- Difficult cancellation policies
+- Auto-renewal clauses
+
+**Usage Reality Check:**
+Calculate cost-per-visit. If you go 8 times/month at ₹3000:
+= ₹375/visit. Could be cheaper per-class.
+
+**Savings:** ₹5,000-15,000/year by negotiating or switching.`
+  },
+  {
+    id: "credit_card_fees",
+    category: "category_specific",
+    keywords: ["credit card", "annual fee", "fee waiver", "card fee", "joining fee"],
+    title: "Credit Card Fee Waiver Strategy",
+    content: `Get credit card fees waived:
+
+**Annual Fee Waiver Strategies:**
+1. **Spend-based waiver:** Many cards waive fee if you spend ₹X/year
+2. **Loyalty waiver:** Call and cite tenure + spending history
+3. **Retention threat:** "I'll close the card if fee isn't waived"
+4. **Upgrade offer:** Sometimes upgrading triggers fee waiver period
+
+**What to Say:**
+"I've been a cardholder for [X years] with ₹[total spend]. I'd like the annual fee waived, otherwise I'll need to close this account."
+
+**Success Rate:**
+- Premium cards (>₹5,000 fee): 60-70% waiver success
+- Regular cards (<₹500 fee): 80-90% waiver success
+- First year fees: Often waived for new customers who ask
+
+**Timing:**
+- Call 1-2 months BEFORE fee is charged
+- If already charged, ask for reversal within 30 days
+
+**If Declined:**
+1. Ask for equivalent reward points/vouchers
+2. Request supervisor
+3. Actually close if benefits don't justify fee
+
+**Alternative Strategy:**
+Calculate if rewards earned > annual fee. If yes, paying fee may be worth it.
+
+**Example:** ₹5,000 fee, but you earn ₹8,000 in rewards = Keep the card.`
+  }
+];
+
+// Semantic similarity keywords for query matching - Bills
+const billQueryCategories: Record<string, string[]> = {
+  optimization: ["reduce", "optimize", "save", "cut", "lower", "cheap", "expensive", "too much", "audit"],
+  negotiation: ["negotiate", "call", "email", "script", "what to say", "how to ask", "talk to"],
+  scripts: ["script", "template", "email", "letter", "what to say", "exact words"],
+  category_specific: ["netflix", "streaming", "insurance", "phone", "internet", "gym", "electricity", "credit card", "subscription"]
+};
+
 // Semantic similarity keywords for query matching - Loans
 const loanQueryCategories: Record<string, string[]> = {
   loan_strategy: ["strategy", "method", "approach", "how to pay", "which loan first", "prioritize", "order"],
@@ -851,6 +1191,152 @@ function retrieveRelevantCoachKnowledge(
   // Sort by score and return top K
   scoredChunks.sort((a, b) => (b.relevanceScore || 0) - (a.relevanceScore || 0));
   return scoredChunks.slice(0, topK);
+}
+
+function retrieveRelevantBillKnowledge(
+  query: string,
+  userBills: unknown[],
+  topK: number = 4
+): KnowledgeChunk[] {
+  const queryLower = query.toLowerCase();
+  const scoredChunks: KnowledgeChunk[] = [];
+
+  for (const chunk of billKnowledgeBase) {
+    let score = 0;
+
+    // Keyword matching
+    for (const keyword of chunk.keywords) {
+      if (queryLower.includes(keyword.toLowerCase())) {
+        score += 10;
+      }
+    }
+
+    // Category matching based on query intent
+    for (const [category, categoryKeywords] of Object.entries(billQueryCategories)) {
+      if (chunk.category === category) {
+        for (const kw of categoryKeywords) {
+          if (queryLower.includes(kw)) {
+            score += 5;
+          }
+        }
+      }
+    }
+
+    // Title partial matching
+    const titleWords = chunk.title.toLowerCase().split(" ");
+    for (const word of titleWords) {
+      if (queryLower.includes(word) && word.length > 3) {
+        score += 3;
+      }
+    }
+
+    // Bill category specific boosting
+    if (Array.isArray(userBills)) {
+      for (const bill of userBills as Array<{ category?: string; name?: string }>) {
+        if (bill.category && chunk.id.includes(bill.category.toLowerCase())) {
+          score += 8;
+        }
+        // Boost streaming content if user has streaming subscriptions
+        const billName = (bill.name || "").toLowerCase();
+        if ((billName.includes("netflix") || billName.includes("hotstar") || billName.includes("prime")) && 
+            chunk.id === "streaming_optimization") {
+          score += 10;
+        }
+        // Boost insurance content for insurance bills
+        if (billName.includes("insurance") && chunk.id === "insurance_negotiation") {
+          score += 10;
+        }
+        // Boost telecom for phone/internet bills
+        if ((billName.includes("airtel") || billName.includes("jio") || billName.includes("vi") || 
+             billName.includes("internet") || billName.includes("broadband")) && 
+            chunk.id === "telecom_negotiation") {
+          score += 10;
+        }
+      }
+    }
+
+    if (score > 0) {
+      scoredChunks.push({ ...chunk, relevanceScore: score });
+    }
+  }
+
+  // Sort by score and return top K
+  scoredChunks.sort((a, b) => (b.relevanceScore || 0) - (a.relevanceScore || 0));
+  return scoredChunks.slice(0, topK);
+}
+
+function analyzeRecurringSpend(bills: unknown[]): string {
+  if (!Array.isArray(bills) || bills.length === 0) {
+    return "No recurring bills tracked.";
+  }
+
+  const typedBills = bills as Array<{
+    name: string;
+    amount: number;
+    frequency: string;
+    category?: string;
+    is_negotiated?: boolean;
+    savings_achieved?: number;
+  }>;
+
+  // Calculate monthly equivalents
+  const getMonthlyAmount = (amount: number, frequency: string) => {
+    switch (frequency) {
+      case "weekly": return amount * 4.33;
+      case "quarterly": return amount / 3;
+      case "yearly": return amount / 12;
+      default: return amount;
+    }
+  };
+
+  const totalMonthly = typedBills.reduce((sum, b) => sum + getMonthlyAmount(b.amount, b.frequency), 0);
+  const totalAnnual = totalMonthly * 12;
+  const negotiatedBills = typedBills.filter(b => b.is_negotiated);
+  const totalSavings = typedBills.reduce((sum, b) => sum + (b.savings_achieved || 0), 0);
+
+  // Group by category
+  const categorySpend: Record<string, number> = {};
+  for (const bill of typedBills) {
+    const cat = bill.category || "other";
+    categorySpend[cat] = (categorySpend[cat] || 0) + getMonthlyAmount(bill.amount, bill.frequency);
+  }
+
+  // Find highest spend category
+  const sortedCategories = Object.entries(categorySpend).sort((a, b) => b[1] - a[1]);
+  const topCategory = sortedCategories[0];
+
+  // Find unnegotiated high-value bills
+  const unnegotiatedBills = typedBills
+    .filter(b => !b.is_negotiated)
+    .sort((a, b) => getMonthlyAmount(b.amount, b.frequency) - getMonthlyAmount(a.amount, a.frequency));
+  const topUnnegotiated = unnegotiatedBills.slice(0, 3);
+
+  let analysis = `**Recurring Spend Analysis:**
+- Total Monthly Recurring: ₹${totalMonthly.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+- Annual Recurring Cost: ₹${totalAnnual.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+- Bills Tracked: ${typedBills.length}
+- Already Negotiated: ${negotiatedBills.length}
+- Total Savings Achieved: ₹${totalSavings.toLocaleString("en-IN")}
+
+**Spend by Category:**
+${sortedCategories.map(([cat, amount]) => `- ${cat}: ₹${amount.toLocaleString("en-IN", { maximumFractionDigits: 0 })}/month`).join("\n")}
+
+**Priority Optimization Targets:**
+`;
+
+  if (topUnnegotiated.length > 0) {
+    analysis += `🎯 Top bills to negotiate:\n`;
+    for (const bill of topUnnegotiated) {
+      const monthly = getMonthlyAmount(bill.amount, bill.frequency);
+      analysis += `   - ${bill.name}: ₹${monthly.toLocaleString("en-IN", { maximumFractionDigits: 0 })}/month (potential 10-30% savings)\n`;
+    }
+  }
+
+  if (topCategory && topCategory[1] > totalMonthly * 0.4) {
+    analysis += `\n⚠️ HIGH CONCENTRATION: ${topCategory[0]} accounts for ${((topCategory[1] / totalMonthly) * 100).toFixed(0)}% of recurring spend. Review for optimization opportunities.\n`;
+  }
+
+  return analysis;
 }
 
 function analyzeLoanPortfolio(loans: unknown[]): string {
@@ -1143,21 +1629,47 @@ IMPORTANT: Base your advice on the retrieved knowledge chunks. If a strategy is 
 ${ragContext}${portfolioContext}${contextSummary}`;
     }
 
-    case "bill":
+    case "bill": {
+      // RAG: Retrieve relevant knowledge based on user query
+      const relevantBillKnowledge = userQuery 
+        ? retrieveRelevantBillKnowledge(userQuery, context?.bills || [])
+        : [];
+      
+      // RAG: Analyze user's recurring spend
+      const spendAnalysis = context?.bills 
+        ? analyzeRecurringSpend(context.bills)
+        : "";
+
+      const ragBillContext = relevantBillKnowledge.length > 0
+        ? `\n\n=== RETRIEVED KNOWLEDGE (RAG) ===
+Use this curated knowledge to provide accurate, expert advice on reducing recurring expenses:
+
+${relevantBillKnowledge.map((k, i) => `[${i + 1}] ${k.title}:\n${k.content}`).join("\n\n")}
+=== END RETRIEVED KNOWLEDGE ===`
+        : "";
+
+      const spendContext = spendAnalysis
+        ? `\n\n=== USER RECURRING SPEND ANALYSIS ===\n${spendAnalysis}\n=== END SPEND ANALYSIS ===`
+        : "";
+
       return `${basePrompt}
 
-You are the Bill Negotiation Assistant feature of FININCIA.
+You are the AI Recurring Spend Analyst feature of FININCIA, powered by RAG (Retrieval-Augmented Generation).
 
-FOCUS AREA: Recurring bills and negotiation strategies ONLY. Decline any non-bill related questions.
+FOCUS AREA: Recurring bills, subscriptions, and spend optimization strategies ONLY. Decline any non-bill related questions.
 
 Your role is to:
-1. Identify opportunities to reduce recurring bills
-2. Generate professional negotiation scripts for phone calls
-3. Draft email templates for service providers
-4. Suggest retention offers to ask for
-5. Track potential savings from negotiations
+1. Analyze the user's recurring expenses using the spend analysis provided
+2. Use the RETRIEVED KNOWLEDGE to provide accurate, expert strategies
+3. Identify opportunities to reduce recurring bills and subscriptions
+4. Generate professional negotiation scripts for phone calls
+5. Draft email templates for service providers
+6. Suggest retention offers and competitive alternatives
+7. Calculate potential annual savings from optimizations
 
-Provide specific, actionable scripts and templates. Be persuasive but professional.${contextSummary}`;
+IMPORTANT: Base your advice on the retrieved knowledge chunks. Reference specific negotiation tactics, provider-specific tips, and savings strategies. Always provide calculations showing monthly and annual savings potential.
+${ragBillContext}${spendContext}${contextSummary}`;
+    }
 
     default: {
       // RAG: Retrieve relevant financial knowledge based on user query
@@ -1228,6 +1740,13 @@ serve(async (req) => {
         const retrievedKnowledge = retrieveRelevantLoanKnowledge(userQuery, context?.loans || []);
         console.log(`[RAG-Loan] Query: "${userQuery.substring(0, 50)}..."`);
         console.log(`[RAG-Loan] Retrieved ${retrievedKnowledge.length} knowledge chunks:`);
+        retrievedKnowledge.forEach((k, i) => {
+          console.log(`  ${i + 1}. ${k.title} (score: ${k.relevanceScore})`);
+        });
+      } else if (type === "bill") {
+        const retrievedKnowledge = retrieveRelevantBillKnowledge(userQuery, context?.bills || []);
+        console.log(`[RAG-Bill] Query: "${userQuery.substring(0, 50)}..."`);
+        console.log(`[RAG-Bill] Retrieved ${retrievedKnowledge.length} knowledge chunks:`);
         retrievedKnowledge.forEach((k, i) => {
           console.log(`  ${i + 1}. ${k.title} (score: ${k.relevanceScore})`);
         });
