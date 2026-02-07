@@ -85,7 +85,7 @@ const FinancialHealthScore = ({ score }: FinancialHealthScoreProps) => {
               }}
             />
           </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-transparent">
             <motion.span
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -94,8 +94,8 @@ const FinancialHealthScore = ({ score }: FinancialHealthScoreProps) => {
             >
               {score.grade}
             </motion.span>
-            <span className="text-2xl font-semibold">{score.overall}</span>
-            <span className="text-xs text-muted-foreground">out of 100</span>
+            <span className="text-2xl font-semibold text-foreground">{score.overall}</span>
+            <span className="text-xs text-muted-foreground bg-transparent">out of 100</span>
           </div>
         </div>
 

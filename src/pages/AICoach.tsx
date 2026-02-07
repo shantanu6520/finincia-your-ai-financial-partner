@@ -88,25 +88,25 @@ const AICoach = () => {
         <Card className="flex-1 flex flex-col overflow-hidden">
           <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-center">
-                <div className="p-4 bg-primary/10 rounded-full mb-4">
-                  <Bot className="w-12 h-12 text-primary" />
+              <div className="flex flex-col items-center justify-center h-full text-center px-4">
+                <div className="p-4 bg-secondary rounded-full mb-4">
+                  <Bot className="w-12 h-12 text-foreground" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">
+                <h3 className="text-xl font-semibold mb-2 text-foreground">
                   Hello! I'm your AI Financial Coach
                 </h3>
                 <p className="text-muted-foreground mb-6 max-w-md">
                   I can help you understand your spending patterns, identify savings opportunities, and provide personalized financial advice.
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl">
                   {suggestedQuestions.map((question, index) => (
                     <Button
                       key={index}
                       variant="outline"
-                      className="text-left h-auto py-3 px-4"
+                      className="text-left h-auto py-3 px-4 whitespace-normal justify-start"
                       onClick={() => handleSuggestedQuestion(question)}
                     >
-                      {question}
+                      <span className="text-sm">{question}</span>
                     </Button>
                   ))}
                 </div>
