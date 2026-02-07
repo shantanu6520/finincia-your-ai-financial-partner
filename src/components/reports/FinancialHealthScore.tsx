@@ -90,13 +90,13 @@ const FinancialHealthScore = ({ score }: FinancialHealthScoreProps) => {
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 }}
-              className={`text-4xl font-bold ${scoreColors[score.grade]}`}
+              className={`text-3xl font-bold ${scoreColors[score.grade]}`}
             >
               {score.grade}
             </motion.span>
-            <span className="text-2xl font-semibold text-foreground">{score.overall}</span>
-            <span className="text-xs text-muted-foreground bg-transparent">out of 100</span>
+            <span className="text-xl font-semibold text-foreground">{score.overall}</span>
           </div>
+          <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs text-muted-foreground whitespace-nowrap">out of 100</span>
         </div>
 
         {/* Score Breakdown */}
