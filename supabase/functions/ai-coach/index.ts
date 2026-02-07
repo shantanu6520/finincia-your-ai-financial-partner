@@ -947,11 +947,149 @@ function analyzeFinancialOverview(context: RequestBody["context"]): string {
 }
 
 // ============================================
+// TOPIC VALIDATION - Financial Focus Only
+// ============================================
+
+const financialTopicKeywords = [
+  // Core financial terms
+  "money", "finance", "financial", "budget", "budgeting", "expense", "expenses", "spending", "spend",
+  "income", "salary", "saving", "savings", "save", "debt", "loan", "loans", "emi", "interest",
+  "investment", "invest", "tax", "taxes", "credit", "debit", "bank", "banking", "account",
+  "payment", "pay", "bill", "bills", "cost", "costs", "price", "afford", "wealth", "rich",
+  "poor", "broke", "cash", "rupee", "rupees", "₹", "inr", "paisa",
+  // Budgeting & planning
+  "50/30/20", "50 30 20", "zero based", "envelope", "allocation", "allocate",
+  // Savings & goals
+  "emergency fund", "goal", "goals", "target", "down payment", "retirement", "corpus",
+  // Debt & loans
+  "emi", "prepayment", "prepay", "principal", "tenure", "interest rate", "balance transfer",
+  "refinance", "avalanche", "snowball", "debt free", "pay off", "payoff",
+  // Credit
+  "credit card", "credit score", "cibil", "credit limit", "minimum payment",
+  // Indian specific
+  "80c", "80d", "section 80", "pf", "ppf", "epf", "nps", "lic", "mutual fund", "sip",
+  "fd", "fixed deposit", "rd", "recurring deposit", "elss", "huf", "gst",
+  // Bills & expenses
+  "subscription", "rent", "utility", "groceries", "food", "transport", "fuel", "petrol",
+  "electricity", "water", "internet", "phone", "mobile", "insurance", "premium",
+  // Financial actions
+  "track", "tracking", "manage", "managing", "plan", "planning", "analyze", "analysis",
+  "calculate", "calculation", "forecast", "predict", "review", "audit",
+  // Financial health
+  "net worth", "assets", "liabilities", "liquidity", "cash flow", "surplus", "deficit",
+  "overspending", "underspending", "savings rate", "expense ratio",
+  // Questions about money
+  "how much", "how to save", "how to budget", "where is my money", "am i spending",
+  "can i afford", "should i buy", "worth it", "too expensive", "cut costs",
+  // Negotiation & optimization
+  "negotiate", "negotiation", "reduce", "lower", "optimize", "save money", "cut",
+  "discount", "offer", "deal", "cheaper", "expensive"
+];
+
+const offTopicIndicators = [
+  // General chat
+  "hello", "hi there", "how are you", "what's up", "good morning", "good evening",
+  "thank you", "thanks", "bye", "goodbye", "see you",
+  // Non-financial topics
+  "weather", "sports", "cricket", "football", "movie", "movies", "music", "song",
+  "recipe", "cooking", "food recipe", "travel", "vacation spot", "tourist",
+  "politics", "election", "news", "celebrity", "actor", "actress",
+  "joke", "funny", "story", "poem", "write me", "create a story",
+  "programming", "code", "coding", "software", "app development",
+  "health advice", "medical", "doctor", "medicine", "exercise routine",
+  "relationship", "dating", "love", "friendship",
+  "homework", "essay", "school project", "college assignment",
+  "game", "gaming", "video game", "play",
+  // AI/tech questions
+  "who made you", "who created you", "are you ai", "what are you", "your name",
+  "can you help with", "do you know about"
+];
+
+function isFinancialQuery(query: string): { isFinancial: boolean; confidence: number } {
+  const queryLower = query.toLowerCase().trim();
+  
+  // Check for off-topic indicators first
+  let offTopicScore = 0;
+  for (const indicator of offTopicIndicators) {
+    if (queryLower.includes(indicator)) {
+      offTopicScore += 10;
+    }
+  }
+  
+  // Check for financial topic keywords
+  let financialScore = 0;
+  for (const keyword of financialTopicKeywords) {
+    if (queryLower.includes(keyword.toLowerCase())) {
+      financialScore += 15; // Financial keywords have higher weight
+    }
+  }
+  
+  // Additional context checks
+  if (queryLower.match(/₹\s*\d+|rs\.?\s*\d+|\d+\s*rupees?|\d+k|\d+l|\d+cr/i)) {
+    financialScore += 20; // Contains currency amounts
+  }
+  
+  if (queryLower.match(/\d+%|percent|percentage/i)) {
+    financialScore += 10; // Contains percentages (interest, savings rate, etc.)
+  }
+  
+  // Short greetings with potential financial follow-up get a pass
+  if (queryLower.length < 20 && (queryLower.includes("hi") || queryLower.includes("hello"))) {
+    // Check if there's more content that might be financial
+    if (financialScore > 0) {
+      return { isFinancial: true, confidence: 0.7 };
+    }
+  }
+  
+  // Calculate final decision
+  const totalScore = financialScore - offTopicScore;
+  const confidence = Math.min(1, Math.max(0, (financialScore / 50)));
+  
+  return {
+    isFinancial: totalScore > 0 || financialScore >= 15,
+    confidence
+  };
+}
+
+const getOffTopicResponse = (): string => {
+  const responses = [
+    "I'm FININCIA, your dedicated financial advisor. I specialize exclusively in personal finance topics like budgeting, saving, debt management, and financial planning. How can I help with your finances today?",
+    "I appreciate you reaching out! However, I'm specifically designed to help with financial matters - budgeting, expenses, loans, savings goals, and money management. What financial question can I help you with?",
+    "That's outside my expertise! I'm your AI financial coach, focused solely on helping you manage money, track expenses, pay off debt, and achieve financial goals. Ask me anything about your finances!",
+    "I'm here to be your personal CFO! While I can't help with that topic, I'd love to assist with budgeting strategies, expense analysis, loan optimization, or any other financial questions you have."
+  ];
+  return responses[Math.floor(Math.random() * responses.length)];
+};
+
+// ============================================
 // SYSTEM PROMPT BUILDER WITH RAG
 // ============================================
 
 const getSystemPrompt = (type: string, context?: RequestBody["context"], userQuery?: string) => {
-  const basePrompt = `You are FININCIA, an AI-powered personal financial advisor. You speak in a clear, professional yet friendly tone - like a trusted CA (Chartered Accountant) friend. Always be helpful, concise, and actionable. Use Indian Rupees (₹) for currency. Never provide investment advice or recommend specific stocks/mutual funds.`;
+  const basePrompt = `You are FININCIA, an AI-powered personal financial advisor built exclusively for personal finance management. 
+
+CRITICAL RULES - YOU MUST FOLLOW THESE:
+1. You ONLY discuss personal finance topics: budgeting, expenses, savings, loans, debt, bills, financial goals, tax planning, and money management.
+2. You MUST politely decline ANY question not related to personal finance.
+3. If asked about non-financial topics (weather, sports, news, recipes, coding, health, relationships, general knowledge, etc.), respond with: "I'm FININCIA, your dedicated financial advisor. I specialize exclusively in personal finance. How can I help with your money matters today?"
+4. Never provide investment advice or recommend specific stocks, mutual funds, or securities.
+5. Always use Indian Rupees (₹) for currency examples.
+6. Speak in a clear, professional yet friendly tone - like a trusted CA (Chartered Accountant) friend.
+7. Be concise and actionable in your advice.
+8. Base your responses on the user's actual financial data when available.
+
+EXAMPLES OF WHAT TO DECLINE:
+- "Tell me a joke" → Decline, redirect to finance
+- "What's the weather?" → Decline, redirect to finance  
+- "Write me a poem" → Decline, redirect to finance
+- "Who is the Prime Minister?" → Decline, redirect to finance
+- "Help me with coding" → Decline, redirect to finance
+
+EXAMPLES OF WHAT TO ANSWER:
+- "Where am I overspending?" → Analyze their transactions
+- "How to budget with 50/30/20?" → Explain budgeting strategy
+- "Should I prepay my loan?" → Provide loan advice
+- "How to save for emergency fund?" → Give savings guidance`;
 
   const contextSummary = context
     ? `\n\nUser's Financial Context:
@@ -991,6 +1129,8 @@ ${relevantKnowledge.map((k, i) => `[${i + 1}] ${k.title}:\n${k.content}`).join("
 
 You are the Loan Strategist feature of FININCIA, powered by RAG (Retrieval-Augmented Generation).
 
+FOCUS AREA: Loan and debt management ONLY. Decline any non-loan/debt related questions.
+
 Your role is to:
 1. Analyze the user's loan portfolio using the portfolio analysis provided
 2. Use the RETRIEVED KNOWLEDGE to provide accurate, expert strategies
@@ -1006,7 +1146,11 @@ ${ragContext}${portfolioContext}${contextSummary}`;
     case "bill":
       return `${basePrompt}
 
-You are the Bill Negotiation Assistant feature of FININCIA. Your role is to:
+You are the Bill Negotiation Assistant feature of FININCIA.
+
+FOCUS AREA: Recurring bills and negotiation strategies ONLY. Decline any non-bill related questions.
+
+Your role is to:
 1. Identify opportunities to reduce recurring bills
 2. Generate professional negotiation scripts for phone calls
 3. Draft email templates for service providers
@@ -1040,6 +1184,8 @@ ${relevantKnowledge.map((k, i) => `[${i + 1}] ${k.title}:\n${k.content}`).join("
 
 You are the AI Financial Coach feature of FININCIA, powered by RAG (Retrieval-Augmented Generation).
 
+FOCUS AREA: Personal finance coaching ONLY. This includes budgeting, saving, spending analysis, and general money management.
+
 Your role is to:
 1. Help users understand their spending patterns
 2. Identify opportunities to save money using the RETRIEVED KNOWLEDGE
@@ -1047,7 +1193,11 @@ Your role is to:
 4. Provide personalized financial advice based on their data
 5. Answer questions about personal finance in India
 
-IMPORTANT: Base your advice on the retrieved knowledge chunks. Reference specific strategies from the knowledge base (like 50/30/20 rule, pay yourself first, etc.) when applicable. Use the user's actual financial data to make recommendations specific and actionable.
+IMPORTANT: 
+- Base your advice on the retrieved knowledge chunks
+- Reference specific strategies from the knowledge base (like 50/30/20 rule, pay yourself first, etc.) when applicable
+- Use the user's actual financial data to make recommendations specific and actionable
+- ALWAYS decline non-financial questions politely and redirect to finance topics
 ${ragContext}${overviewContext}${contextSummary}`;
     }
   }
