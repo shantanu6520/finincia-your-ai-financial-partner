@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
 import fininciaLogo from "@/assets/finincia-logo.png";
 
 const navLinks = [
@@ -63,27 +64,31 @@ const Navbar = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-4 flex-shrink-0">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className={`font-medium tracking-wide transition-all duration-300 ${
-                isScrolled 
-                  ? 'text-foreground hover:bg-foreground hover:text-background' 
-                  : 'text-primary-foreground hover:bg-primary-foreground hover:text-primary'
-              }`}
-            >
-              Log In
-            </Button>
-            <Button 
-              size="sm"
-              className={`font-medium tracking-wide ${
-                isScrolled
-                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                  : 'bg-primary-foreground text-primary hover:bg-primary-foreground/90'
-              }`}
-            >
-              Get Started
-            </Button>
+            <Link to="/auth">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className={`font-medium tracking-wide transition-all duration-300 ${
+                  isScrolled 
+                    ? 'text-foreground hover:bg-foreground hover:text-background' 
+                    : 'text-primary-foreground hover:bg-primary-foreground hover:text-primary'
+                }`}
+              >
+                Log In
+              </Button>
+            </Link>
+            <Link to="/auth">
+              <Button 
+                size="sm"
+                className={`font-medium tracking-wide ${
+                  isScrolled
+                    ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                    : 'bg-primary-foreground text-primary hover:bg-primary-foreground/90'
+                }`}
+              >
+                Get Started
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -119,12 +124,16 @@ const Navbar = () => {
                 </a>
               ))}
               <div className="flex flex-col gap-3 pt-6 border-t border-border">
-                <Button variant="outline" className="w-full">
-                  Log In
-                </Button>
-                <Button className="w-full bg-primary text-primary-foreground">
-                  Get Started
-                </Button>
+                <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full">
+                    Log In
+                  </Button>
+                </Link>
+                <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button className="w-full bg-primary text-primary-foreground">
+                    Get Started
+                  </Button>
+                </Link>
               </div>
             </div>
           </motion.div>
