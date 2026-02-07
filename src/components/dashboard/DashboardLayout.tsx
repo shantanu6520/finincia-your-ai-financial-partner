@@ -37,7 +37,7 @@ const navItems = [
   { icon: ClipboardList, label: "Reports", path: "/reports", isPro: true },
   { icon: Sparkles, label: "AI Coach", path: "/ai-coach", isPro: true },
   { icon: Calculator, label: "Loan Strategist", path: "/loan-strategist", isPro: true },
-  { icon: FileText, label: "Bill Negotiation", path: "/bill-negotiation", isPro: true },
+  { icon: FileText, label: "Recurring Spend Optimizer", path: "/bill-negotiation", isPro: true },
   { icon: User, label: "Profile", path: "/profile" },
 ];
 
