@@ -11,7 +11,10 @@ import {
   X,
   ChevronRight,
   PieChart,
-  Target
+  Target,
+  Sparkles,
+  Calculator,
+  FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -28,6 +31,9 @@ const navItems = [
   { icon: Receipt, label: "Transactions", path: "/transactions" },
   { icon: PieChart, label: "Budgets", path: "/budgets" },
   { icon: Target, label: "Goals", path: "/goals" },
+  { icon: Sparkles, label: "AI Coach", path: "/ai-coach", isPro: true },
+  { icon: Calculator, label: "Loan Strategist", path: "/loan-strategist", isPro: true },
+  { icon: FileText, label: "Bill Negotiation", path: "/bill-negotiation", isPro: true },
   { icon: User, label: "Profile", path: "/profile" },
 ];
 
@@ -89,7 +95,12 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 >
                   <item.icon className="w-5 h-5" />
                   <span className="font-medium">{item.label}</span>
-                  {isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
+                  {item.isPro && (
+                    <span className="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded-full ml-auto">
+                      PRO
+                    </span>
+                  )}
+                  {isActive && !item.isPro && <ChevronRight className="w-4 h-4 ml-auto" />}
                 </Link>
               );
             })}

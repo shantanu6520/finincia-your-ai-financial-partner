@@ -13,6 +13,9 @@ import Transactions from "./pages/Transactions";
 import Budgets from "./pages/Budgets";
 import Goals from "./pages/Goals";
 import Profile from "./pages/Profile";
+import AICoach from "./pages/AICoach";
+import LoanStrategist from "./pages/LoanStrategist";
+import BillNegotiation from "./pages/BillNegotiation";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "@/components/dashboard/ProtectedRoute";
 
@@ -74,6 +77,30 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/ai-coach"
+              element={
+                <ProtectedRoute>
+                  <AICoach />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/loan-strategist"
+              element={
+                <ProtectedRoute>
+                  <LoanStrategist />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/bill-negotiation"
+              element={
+                <ProtectedRoute>
+                  <BillNegotiation />
                 </ProtectedRoute>
               }
             />
