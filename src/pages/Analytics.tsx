@@ -26,6 +26,7 @@ const Analytics = () => {
   const {
     isLoading,
     cashFlowForecast,
+    cashFlowInsights,
     budgetPredictions,
     anomalies,
     trendData,
@@ -186,6 +187,7 @@ const Analytics = () => {
             forecast90Day={summary.forecast90Day}
             currencySymbol={currencySymbol}
             formatAmount={formatAmount}
+            insights={cashFlowInsights}
           />
         </motion.div>
 

@@ -2,8 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
-import { TrendingUp, TrendingDown, Calendar } from "lucide-react";
-import type { CashFlowForecast as CashFlowData } from "@/hooks/usePredictiveAnalytics";
+import { TrendingUp, TrendingDown, Calendar, ArrowUpRight, ArrowDownRight, Lightbulb, AlertCircle } from "lucide-react";
+import type { CashFlowForecast as CashFlowData, CashFlowInsights } from "@/hooks/usePredictiveAnalytics";
 
 interface CashFlowForecastProps {
   data: CashFlowData[];
@@ -13,6 +13,7 @@ interface CashFlowForecastProps {
   forecast90Day: number;
   currencySymbol: string;
   formatAmount: (amount: number) => string;
+  insights?: CashFlowInsights;
 }
 
 const CashFlowForecast = ({
@@ -23,6 +24,7 @@ const CashFlowForecast = ({
   forecast90Day,
   currencySymbol,
   formatAmount,
+  insights,
 }: CashFlowForecastProps) => {
   const get30DayData = () => data.slice(0, 14 + 30);
   const get60DayData = () => data.slice(0, 14 + 60);
@@ -207,6 +209,114 @@ const CashFlowForecast = ({
             <span>Confidence Range</span>
           </div>
         </div>
+
+        {/* Smart Insights Section */}
+        {insights && (
+          <div className="space-y-4 pt-2">
+            {/* Income Sources */}
+            <div className="p-4 rounded-xl bg-secondary/50 border border-border/30">
+              <div className="flex items-center gap-2 mb-3">
+                <ArrowUpRight className="w-4 h-4 text-green-500" />
+                <h4 className="font-semibold text-sm">Where Money Comes From</h4>
+              </div>
+              {insights.incomeSources.length > 0 ? (
+                <div className="space-y-2">
+                  {insights.incomeSources.slice(0, 4).map((source, idx) => (
+                    <div key={idx} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">{source.category}</span>
+                        <Badge variant="outline" className="text-xs">
+                          {source.frequency}
+                        </Badge>
+                        {source.trend === "increasing" && (
+                          <TrendingUp className="w-3 h-3 text-green-500" />
+                        )}
+                        {source.trend === "decreasing" && (
+                          <TrendingDown className="w-3 h-3 text-red-500" />
+                        )}
+                      </div>
+                      <span className="font-medium text-green-600">
+                        +{currencySymbol}{formatAmount(source.amount)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No income recorded yet. Add your salary or other income sources.</p>
+              )}
+            </div>
+
+            {/* Expense Destinations */}
+            <div className="p-4 rounded-xl bg-secondary/50 border border-border/30">
+              <div className="flex items-center gap-2 mb-3">
+                <ArrowDownRight className="w-4 h-4 text-red-500" />
+                <h4 className="font-semibold text-sm">Where Money Goes</h4>
+              </div>
+              {insights.expenseDestinations.length > 0 ? (
+                <div className="space-y-2">
+                  {insights.expenseDestinations.slice(0, 5).map((dest, idx) => (
+                    <div key={idx} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">{dest.category}</span>
+                        <span className="text-xs text-muted-foreground">({dest.percentage.toFixed(0)}%)</span>
+                        {dest.isRecurring && (
+                          <Badge variant="outline" className="text-xs">recurring</Badge>
+                        )}
+                        {dest.trend === "increasing" && (
+                          <TrendingUp className="w-3 h-3 text-red-500" />
+                        )}
+                        {dest.trend === "decreasing" && (
+                          <TrendingDown className="w-3 h-3 text-green-500" />
+                        )}
+                      </div>
+                      <span className="font-medium text-red-600">
+                        -{currencySymbol}{formatAmount(dest.amount)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No expenses recorded yet.</p>
+              )}
+            </div>
+
+            {/* AI Predictions & Insights */}
+            {(insights.predictions.length > 0 || insights.incomePatterns.length > 0 || insights.expensePatterns.length > 0) && (
+              <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <Lightbulb className="w-4 h-4 text-primary" />
+                  <h4 className="font-semibold text-sm">AI Insights</h4>
+                </div>
+                <div className="space-y-2 text-sm">
+                  {insights.incomePatterns.map((pattern, idx) => (
+                    <div key={`income-${idx}`} className="flex items-start gap-2">
+                      <span className="text-green-500">•</span>
+                      <span className="text-muted-foreground">{pattern}</span>
+                    </div>
+                  ))}
+                  {insights.expensePatterns.map((pattern, idx) => (
+                    <div key={`expense-${idx}`} className="flex items-start gap-2">
+                      <span className={pattern.includes("⚠️") ? "text-orange-500" : "text-red-500"}>•</span>
+                      <span className="text-muted-foreground">{pattern}</span>
+                    </div>
+                  ))}
+                  {insights.predictions.map((prediction, idx) => (
+                    <div key={`pred-${idx}`} className="flex items-start gap-2 font-medium">
+                      {prediction.includes("⚠️") ? (
+                        <AlertCircle className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                      ) : (
+                        <span className="text-primary">→</span>
+                      )}
+                      <span className={prediction.includes("⚠️") ? "text-orange-600" : "text-foreground"}>
+                        {prediction.replace("⚠️ ", "")}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
