@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_conversations: {
+        Row: {
+          conversation_type: string
+          created_at: string
+          id: string
+          messages: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          conversation_type?: string
+          created_at?: string
+          id?: string
+          messages?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          conversation_type?: string
+          created_at?: string
+          id?: string
+          messages?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       budgets: {
         Row: {
           amount: number
@@ -133,6 +160,57 @@ export type Database = {
         }
         Relationships: []
       }
+      loans: {
+        Row: {
+          created_at: string
+          current_balance: number
+          emi_amount: number
+          id: string
+          interest_rate: number
+          is_active: boolean | null
+          loan_type: string
+          name: string
+          notes: string | null
+          principal_amount: number
+          start_date: string
+          tenure_months: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_balance?: number
+          emi_amount?: number
+          id?: string
+          interest_rate?: number
+          is_active?: boolean | null
+          loan_type?: string
+          name: string
+          notes?: string | null
+          principal_amount?: number
+          start_date?: string
+          tenure_months?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_balance?: number
+          emi_amount?: number
+          id?: string
+          interest_rate?: number
+          is_active?: boolean | null
+          loan_type?: string
+          name?: string
+          notes?: string | null
+          principal_amount?: number
+          start_date?: string
+          tenure_months?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -164,6 +242,60 @@ export type Database = {
           id?: string
           name?: string | null
           region?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      recurring_bills: {
+        Row: {
+          amount: number
+          category: string | null
+          created_at: string
+          due_date: number | null
+          frequency: string
+          id: string
+          is_active: boolean | null
+          is_negotiated: boolean | null
+          last_paid_date: string | null
+          name: string
+          notes: string | null
+          provider: string | null
+          savings_achieved: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          category?: string | null
+          created_at?: string
+          due_date?: number | null
+          frequency?: string
+          id?: string
+          is_active?: boolean | null
+          is_negotiated?: boolean | null
+          last_paid_date?: string | null
+          name: string
+          notes?: string | null
+          provider?: string | null
+          savings_achieved?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category?: string | null
+          created_at?: string
+          due_date?: number | null
+          frequency?: string
+          id?: string
+          is_active?: boolean | null
+          is_negotiated?: boolean | null
+          last_paid_date?: string | null
+          name?: string
+          notes?: string | null
+          provider?: string | null
+          savings_achieved?: number | null
           updated_at?: string
           user_id?: string
         }
