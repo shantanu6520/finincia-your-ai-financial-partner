@@ -18,6 +18,7 @@ import {
   Activity,
   ClipboardList
 } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import fininciaLogo from "@/assets/finincia-logo.png";
@@ -83,32 +84,34 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 py-6 px-4 space-y-2">
-            {navItems.map((item) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                    isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                  }`}
-                >
-                  <item.icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
-                  {item.isPro && (
-                    <span className="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded-full ml-auto">
-                      PRO
-                    </span>
-                  )}
-                  {isActive && !item.isPro && <ChevronRight className="w-4 h-4 ml-auto" />}
-                </Link>
-              );
-            })}
-          </nav>
+          <ScrollArea className="flex-1">
+            <nav className="py-6 px-4 space-y-2">
+              {navItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    }`}
+                  >
+                    <item.icon className="w-5 h-5" />
+                    <span className="font-medium">{item.label}</span>
+                    {item.isPro && (
+                      <span className="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded-full ml-auto">
+                        PRO
+                      </span>
+                    )}
+                    {isActive && !item.isPro && <ChevronRight className="w-4 h-4 ml-auto" />}
+                  </Link>
+                );
+              })}
+            </nav>
+          </ScrollArea>
 
           {/* User Section */}
           <div className="p-4 border-t border-border">
