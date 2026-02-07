@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useTransactions } from "./useTransactions";
 import { useBudgets } from "./useBudgets";
 import { useWallets } from "./useWallets";
+import { useRecurringBills } from "./useRecurringBills";
 import { format, subDays, addDays, startOfMonth, endOfMonth, differenceInDays, getDate } from "date-fns";
 
 export interface CashFlowForecast {
@@ -80,8 +81,9 @@ export const usePredictiveAnalytics = () => {
   const { transactions, isLoading: txLoading } = useTransactions({ startDate, endDate });
   const { budgets, loading: budgetsLoading } = useBudgets();
   const { wallets, totalBalance, isLoading: walletsLoading } = useWallets();
+  const { bills: recurringBills, totalMonthlyBills, isLoading: billsLoading } = useRecurringBills();
 
-  const isLoading = txLoading || budgetsLoading || walletsLoading;
+  const isLoading = txLoading || budgetsLoading || walletsLoading || billsLoading;
 
   // Analyze income sources and patterns
   const incomeAnalysis = useMemo(() => {
@@ -243,10 +245,8 @@ export const usePredictiveAnalytics = () => {
     };
   }, [incomeAnalysis, expenseAnalysis]);
 
-  // Calculate daily averages from historical data (enhanced)
+  // Calculate daily averages from historical data (enhanced) - includes recurring bills
   const dailyAverages = useMemo(() => {
-    if (transactions.length === 0) return { income: 0, expense: 0, netDaily: 0 };
-
     const last30Days = transactions.filter(
       (t) => new Date(t.transaction_date) >= subDays(now, 30)
     );
@@ -255,16 +255,20 @@ export const usePredictiveAnalytics = () => {
       .filter((t) => t.type === "income")
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
-    const totalExpense = last30Days
+    const transactionExpenses = last30Days
       .filter((t) => t.type === "expense")
       .reduce((sum, t) => sum + Number(t.amount), 0);
+    
+    // Add monthly recurring bills (spread across 30 days)
+    const totalExpense = transactionExpenses + totalMonthlyBills;
 
     return {
       income: totalIncome / 30,
       expense: totalExpense / 30,
       netDaily: (totalIncome - totalExpense) / 30,
+      recurringDaily: totalMonthlyBills / 30,
     };
-  }, [transactions, now]);
+  }, [transactions, now, totalMonthlyBills]);
 
   // Cash Flow Forecasting (30/60/90 days)
   const cashFlowForecast = useMemo((): CashFlowForecast[] => {
