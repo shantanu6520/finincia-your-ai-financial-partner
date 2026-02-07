@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Check, ArrowRight } from "lucide-react";
@@ -14,6 +15,8 @@ const features = [
 ];
 
 const PricingSection = () => {
+  const [isAnnual, setIsAnnual] = useState(false);
+
   return (
     <section className="py-28 bg-background">
       <div className="container mx-auto px-4">
@@ -31,9 +34,36 @@ const PricingSection = () => {
             Invest in Your{" "}
             <span className="italic">Financial Future</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Less than what you spend on coffee each month. More valuable than any financial advisor.
           </p>
+
+          {/* Billing Toggle */}
+          <div className="flex items-center justify-center gap-4">
+            <span className={`text-sm font-medium ${!isAnnual ? 'text-foreground' : 'text-muted-foreground'}`}>
+              Monthly
+            </span>
+            <button
+              onClick={() => setIsAnnual(!isAnnual)}
+              className={`relative w-14 h-7 rounded-full transition-colors ${
+                isAnnual ? 'bg-primary' : 'bg-muted'
+              }`}
+            >
+              <span
+                className={`absolute top-1 w-5 h-5 rounded-full bg-background transition-transform ${
+                  isAnnual ? 'translate-x-8' : 'translate-x-1'
+                }`}
+              />
+            </button>
+            <span className={`text-sm font-medium ${isAnnual ? 'text-foreground' : 'text-muted-foreground'}`}>
+              Annual
+            </span>
+            {isAnnual && (
+              <span className="ml-2 px-2 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full">
+                Save ₹3,989
+              </span>
+            )}
+          </div>
         </motion.div>
 
         <motion.div
@@ -51,16 +81,24 @@ const PricingSection = () => {
               {/* Header */}
               <div className="bg-primary p-10 text-center">
                 <span className="inline-block px-3 py-1 rounded-full border border-primary-foreground/20 text-primary-foreground/80 text-xs font-medium tracking-wider uppercase mb-4">
-                  Most Popular
+                  {isAnnual ? 'Best Value' : 'Most Popular'}
                 </span>
                 <h3 className="font-display text-2xl font-bold text-primary-foreground mb-4">
                   FININCIA Pro
                 </h3>
                 <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-5xl font-display font-bold text-primary-foreground">₹999</span>
-                  <span className="text-primary-foreground/60">/month</span>
+                  <span className="text-5xl font-display font-bold text-primary-foreground">
+                    {isAnnual ? '₹7,999' : '₹999'}
+                  </span>
+                  <span className="text-primary-foreground/60">
+                    /{isAnnual ? 'year' : 'month'}
+                  </span>
                 </div>
-                <p className="text-primary-foreground/50 mt-2 text-sm">Billed monthly. Cancel anytime.</p>
+                <p className="text-primary-foreground/50 mt-2 text-sm">
+                  {isAnnual 
+                    ? 'Billed annually. That\'s just ₹667/month!' 
+                    : 'Billed monthly. Cancel anytime.'}
+                </p>
               </div>
               
               {/* Features */}
