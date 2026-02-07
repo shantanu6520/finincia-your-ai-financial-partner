@@ -359,9 +359,9 @@ const BillNegotiation = () => {
             <CardTitle className="text-lg flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-primary" />
               AI Recurring Spend Analyst
-              <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
+              <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-normal">
                 RAG Powered
-              </Badge>
+              </span>
             </CardTitle>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col overflow-hidden p-4 pt-0">
