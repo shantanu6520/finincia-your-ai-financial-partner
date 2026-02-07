@@ -14,7 +14,8 @@ import {
   Target,
   Sparkles,
   Calculator,
-  FileText
+  FileText,
+  Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -31,6 +32,7 @@ const navItems = [
   { icon: Receipt, label: "Transactions", path: "/transactions" },
   { icon: PieChart, label: "Budgets", path: "/budgets" },
   { icon: Target, label: "Goals", path: "/goals" },
+  { icon: Activity, label: "Analytics", path: "/analytics", isPro: true },
   { icon: Sparkles, label: "AI Coach", path: "/ai-coach", isPro: true },
   { icon: Calculator, label: "Loan Strategist", path: "/loan-strategist", isPro: true },
   { icon: FileText, label: "Bill Negotiation", path: "/bill-negotiation", isPro: true },
