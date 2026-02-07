@@ -39,31 +39,40 @@ const PricingSection = () => {
           </p>
 
           {/* Billing Toggle */}
-          <div className="flex items-center justify-center gap-4">
-            <span className={`text-sm font-medium ${!isAnnual ? 'text-foreground' : 'text-muted-foreground'}`}>
-              Monthly
-            </span>
+          <div className="inline-flex items-center justify-center gap-1 p-1.5 bg-secondary/50 rounded-full border border-border backdrop-blur-sm">
             <button
-              onClick={() => setIsAnnual(!isAnnual)}
-              className={`relative w-14 h-7 rounded-full transition-colors ${
-                isAnnual ? 'bg-primary' : 'bg-muted'
+              onClick={() => setIsAnnual(false)}
+              className={`relative px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                !isAnnual 
+                  ? 'bg-primary text-primary-foreground shadow-lg' 
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <span
-                className={`absolute top-1 w-5 h-5 rounded-full bg-background transition-transform ${
-                  isAnnual ? 'translate-x-8' : 'translate-x-1'
-                }`}
-              />
+              Monthly
             </button>
-            <span className={`text-sm font-medium ${isAnnual ? 'text-foreground' : 'text-muted-foreground'}`}>
-              Annual
-            </span>
-            {isAnnual && (
-              <span className="ml-2 px-2 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full">
-                Save ₹3,989
-              </span>
-            )}
+            <button
+              onClick={() => setIsAnnual(true)}
+              className={`relative px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                isAnnual 
+                  ? 'bg-primary text-primary-foreground shadow-lg' 
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+            Annual
+            </button>
           </div>
+          {isAnnual && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4"
+            >
+              <span className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-primary/10 text-primary rounded-full border border-primary/20">
+                <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                Save ₹3,989 per year
+              </span>
+            </motion.div>
+          )}
         </motion.div>
 
         <motion.div
