@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { FileDown, Loader2, Calendar, FileText, Share2, Copy, Check } from "lucide-react";
+import { FileDown, Loader2, Calendar, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { QuarterlyReviewData } from "@/hooks/useFinancialReview";
 import { toast } from "sonner";
@@ -13,7 +13,6 @@ interface PDFReportGeneratorProps {
 
 const PDFReportGenerator = ({ reviewData, currency = "INR", userName }: PDFReportGeneratorProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
   const [reportType, setReportType] = useState<"monthly" | "quarterly">("quarterly");
 
   const currencySymbol = currency === 'INR' ? '₹' : '$';
@@ -38,11 +37,13 @@ const PDFReportGenerator = ({ reviewData, currency = "INR", userName }: PDFRepor
           .section-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0; }
           .score-box { text-align: center; padding: 32px; background: linear-gradient(135deg, #f8f8f8 0%, #fff 100%); border-radius: 12px; margin-bottom: 20px; border: 1px solid #e0e0e0; }
           .score-grade { font-size: 56px; font-weight: 700; color: ${reviewData.healthScore.overall >= 70 ? '#10b981' : reviewData.healthScore.overall >= 50 ? '#f59e0b' : '#ef4444'}; }
-          .score-number { font-size: 24px; color: #666; margin-top: 8px; }
+          .score-number { font-size: 28px; color: #333; margin-top: 8px; font-weight: 600; }
+          .score-max { font-size: 18px; color: #666; font-weight: 400; }
           .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
           .stat-card { background: #f8f8f8; padding: 20px; border-radius: 12px; border: 1px solid #e8e8e8; }
           .stat-label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-          .stat-value { font-size: 28px; font-weight: 700; margin-top: 4px; }
+          .stat-value { font-size: 28px; font-weight: 700; margin-top: 4px; color: #1a1a1a; }
+          .stat-max { font-size: 16px; color: #666; font-weight: 500; }
           .stat-change { font-size: 12px; margin-top: 4px; }
           .win-item { padding: 16px; background: #ecfdf5; border-left: 4px solid #10b981; margin-bottom: 12px; border-radius: 0 8px 8px 0; }
           .gap-item { padding: 16px; background: #fef3c7; border-left: 4px solid #f59e0b; margin-bottom: 12px; border-radius: 0 8px 8px 0; }
@@ -83,25 +84,25 @@ const PDFReportGenerator = ({ reviewData, currency = "INR", userName }: PDFRepor
             <div class="section-title">📊 Financial Health Score</div>
             <div class="score-box">
               <div class="score-grade">${reviewData.healthScore.grade}</div>
-              <div class="score-number">${reviewData.healthScore.overall}/100</div>
+              <div class="score-number">${reviewData.healthScore.overall} <span class="score-max">out of 100</span></div>
               <p style="margin-top: 16px; color: #666; font-size: 14px;">${reviewData.healthScore.interpretation}</p>
             </div>
             <div class="grid">
               <div class="stat-card">
                 <div class="stat-label">Savings Rate</div>
-                <div class="stat-value">${reviewData.healthScore.components.savings}<span style="font-size: 14px; color: #666;">/100</span></div>
+                <div class="stat-value">${reviewData.healthScore.components.savings} <span class="stat-max">/ 100</span></div>
               </div>
               <div class="stat-card">
                 <div class="stat-label">Budget Adherence</div>
-                <div class="stat-value">${reviewData.healthScore.components.budgetAdherence}<span style="font-size: 14px; color: #666;">/100</span></div>
+                <div class="stat-value">${reviewData.healthScore.components.budgetAdherence} <span class="stat-max">/ 100</span></div>
               </div>
               <div class="stat-card">
                 <div class="stat-label">Debt Management</div>
-                <div class="stat-value">${reviewData.healthScore.components.debtManagement}<span style="font-size: 14px; color: #666;">/100</span></div>
+                <div class="stat-value">${reviewData.healthScore.components.debtManagement} <span class="stat-max">/ 100</span></div>
               </div>
               <div class="stat-card">
                 <div class="stat-label">Goal Progress</div>
-                <div class="stat-value">${reviewData.healthScore.components.goalProgress}<span style="font-size: 14px; color: #666;">/100</span></div>
+                <div class="stat-value">${reviewData.healthScore.components.goalProgress} <span class="stat-max">/ 100</span></div>
               </div>
             </div>
           </div>
@@ -225,52 +226,6 @@ const PDFReportGenerator = ({ reviewData, currency = "INR", userName }: PDFRepor
     }
   };
 
-  const handleShare = async () => {
-    setIsSharing(true);
-    
-    try {
-      const reportSummary = `📊 FININCIA Financial Report - ${reviewData.quarterLabel}
-
-💯 Health Score: ${reviewData.healthScore.overall}/100 (${reviewData.healthScore.grade})
-
-📈 This Quarter:
-• Income: ${currencySymbol}${reviewData.quarterComparison.currentQuarter.income.toLocaleString()}
-• Expenses: ${currencySymbol}${reviewData.quarterComparison.currentQuarter.expenses.toLocaleString()}
-• Savings: ${currencySymbol}${reviewData.quarterComparison.currentQuarter.savings.toLocaleString()} (${reviewData.quarterComparison.currentQuarter.savingsRate.toFixed(1)}%)
-
-💰 Net Worth: ${reviewData.netWorth >= 0 ? '' : '-'}${currencySymbol}${Math.abs(reviewData.netWorth).toLocaleString()}
-📉 Total Debt: ${currencySymbol}${reviewData.totalDebt.toLocaleString()}
-
-Generated by FININCIA - Your AI-Powered Financial CFO`;
-
-      // Try Web Share API first (works on mobile and some desktop browsers)
-      if (navigator.share) {
-        await navigator.share({
-          title: `FININCIA Financial Report - ${reviewData.quarterLabel}`,
-          text: reportSummary,
-        });
-        toast.success("Report shared successfully!");
-      } else {
-        // Fallback to clipboard
-        await navigator.clipboard.writeText(reportSummary);
-        toast.success("Report summary copied to clipboard!");
-      }
-    } catch (error) {
-      // User cancelled share or clipboard failed
-      if ((error as Error).name !== 'AbortError') {
-        try {
-          const fallbackText = `FININCIA Report - Score: ${reviewData.healthScore.overall}/100 | Net Worth: ${currencySymbol}${reviewData.netWorth.toLocaleString()}`;
-          await navigator.clipboard.writeText(fallbackText);
-          toast.success("Report summary copied to clipboard!");
-        } catch {
-          toast.error("Unable to share report");
-        }
-      }
-    } finally {
-      setIsSharing(false);
-    }
-  };
-
   return (
     <div className="bg-card border border-border/50 rounded-2xl p-6">
       <div className="flex items-center gap-2 mb-6">
@@ -317,34 +272,18 @@ Generated by FININCIA - Your AI-Powered Financial CFO`;
         </motion.button>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <Button
-          onClick={generatePDF}
-          disabled={isGenerating}
-          className="flex-1"
-        >
-          {isGenerating ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <FileDown className="w-4 h-4 mr-2" />
-          )}
-          Download as PDF
-        </Button>
-
-        <Button 
-          variant="outline" 
-          className="flex-1"
-          onClick={handleShare}
-          disabled={isSharing}
-        >
-          {isSharing ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <Share2 className="w-4 h-4 mr-2" />
-          )}
-          Share Report
-        </Button>
-      </div>
+      <Button
+        onClick={generatePDF}
+        disabled={isGenerating}
+        className="w-full"
+      >
+        {isGenerating ? (
+          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+        ) : (
+          <FileDown className="w-4 h-4 mr-2" />
+        )}
+        Download as PDF
+      </Button>
 
       <p className="text-xs text-muted-foreground mt-4 text-center">
         Professional CA-style reports with FININCIA branding. Perfect for sharing with your spouse or financial advisor.
