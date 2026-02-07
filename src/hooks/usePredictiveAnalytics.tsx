@@ -144,19 +144,21 @@ export const usePredictiveAnalytics = () => {
   };
 
   // Analyze expense destinations and patterns (includes recurring bills)
+  // NOTE: This analysis shows MONTHLY averages, not 90-day totals
   const expenseAnalysis = useMemo(() => {
     const expenseTransactions = transactions.filter((t) => t.type === "expense");
     
-    // Calculate transaction expenses total
+    // Calculate MONTHLY average from 90-day transaction data
     const transactionExpensesTotal = expenseTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
+    const monthlyTransactionExpenses = transactionExpensesTotal / 3; // Convert 90-day to monthly
     
-    // Calculate recurring bills total (monthly equivalent, scaled to 90-day period = 3 months)
-    const recurringExpensesTotal = totalMonthlyBills * 3;
+    // Recurring bills are already in monthly equivalent
+    const monthlyRecurringExpenses = totalMonthlyBills;
     
-    // Total expenses includes both
-    const totalExpenses = transactionExpensesTotal + recurringExpensesTotal;
+    // Total monthly expenses (for percentage calculation)
+    const totalMonthlyExpenses = monthlyTransactionExpenses + monthlyRecurringExpenses;
     
-    // Group transactions by category
+    // Group transactions by category (convert to monthly averages)
     const byCategory: Record<string, { amounts: number[]; dates: string[]; hasRecurring: boolean; recurringAmount: number }> = {};
     
     expenseTransactions.forEach((t) => {
@@ -166,21 +168,24 @@ export const usePredictiveAnalytics = () => {
       byCategory[cat].dates.push(t.transaction_date);
     });
     
-    // Add recurring bills to category breakdown (scaled to 3 months to match 90-day transaction window)
+    // Add recurring bills to category breakdown (monthly amounts - NOT multiplied by 3)
     recurringBills.forEach((bill) => {
       const cat = bill.category || "Bills & Utilities";
       if (!byCategory[cat]) byCategory[cat] = { amounts: [], dates: [], hasRecurring: false, recurringAmount: 0 };
       byCategory[cat].hasRecurring = true;
-      byCategory[cat].recurringAmount += getMonthlyEquivalent(Number(bill.amount), bill.frequency) * 3;
+      byCategory[cat].recurringAmount += getMonthlyEquivalent(Number(bill.amount), bill.frequency);
     });
 
     const destinations: ExpenseDestination[] = Object.entries(byCategory).map(([category, data]) => {
-      const transactionTotal = data.amounts.reduce((a, b) => a + b, 0);
-      const total = transactionTotal + data.recurringAmount;
-      const percentage = totalExpenses > 0 ? (total / totalExpenses) * 100 : 0;
+      // Convert transaction total to monthly average (divide by 3 for 90-day period)
+      const monthlyTransactionAvg = data.amounts.reduce((a, b) => a + b, 0) / 3;
+      // recurringAmount is already monthly
+      const total = monthlyTransactionAvg + data.recurringAmount;
+      const percentage = totalMonthlyExpenses > 0 ? (total / totalMonthlyExpenses) * 100 : 0;
       
       // Mark as recurring if has recurring bills or transaction pattern suggests recurring
-      const avgAmount = data.amounts.length > 0 ? transactionTotal / data.amounts.length : 0;
+      const transactionSum = data.amounts.reduce((a, b) => a + b, 0);
+      const avgAmount = data.amounts.length > 0 ? transactionSum / data.amounts.length : 0;
       const variance = data.amounts.length > 0 
         ? data.amounts.reduce((sum, a) => sum + Math.abs(a - avgAmount), 0) / data.amounts.length 
         : 0;
