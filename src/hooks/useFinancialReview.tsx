@@ -5,7 +5,7 @@ import { useGoals } from "./useGoals";
 import { useLoans } from "./useLoans";
 import { useWallets } from "./useWallets";
 import { useRecurringBills } from "./useRecurringBills";
-import { format, subMonths, startOfQuarter, endOfQuarter, subQuarters } from "date-fns";
+import { format, subMonths, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, subQuarters } from "date-fns";
 
 export interface FinancialHealthScore {
   overall: number;
@@ -28,6 +28,27 @@ export interface QuarterlyComparison {
     savingsRate: number;
   };
   previousQuarter: {
+    income: number;
+    expenses: number;
+    savings: number;
+    savingsRate: number;
+  };
+  changes: {
+    income: number;
+    expenses: number;
+    savings: number;
+    savingsRate: number;
+  };
+}
+
+export interface MonthlyComparison {
+  currentMonth: {
+    income: number;
+    expenses: number;
+    savings: number;
+    savingsRate: number;
+  };
+  previousMonth: {
     income: number;
     expenses: number;
     savings: number;
@@ -66,6 +87,7 @@ export interface FinancialGap {
 export interface QuarterlyReviewData {
   healthScore: FinancialHealthScore;
   quarterComparison: QuarterlyComparison;
+  monthlyComparison: MonthlyComparison;
   wins: FinancialWin[];
   gaps: FinancialGap[];
   actionItems: ActionItem[];
@@ -78,15 +100,24 @@ export interface QuarterlyReviewData {
     atRisk: number;
   };
   quarterLabel: string;
+  monthLabel: string;
   generatedAt: string;
 }
 
 export const useFinancialReview = () => {
   const now = new Date();
+  
+  // Quarterly date ranges
   const currentQuarterStart = startOfQuarter(now);
   const currentQuarterEnd = endOfQuarter(now);
   const previousQuarterStart = startOfQuarter(subQuarters(now, 1));
   const previousQuarterEnd = endOfQuarter(subQuarters(now, 1));
+
+  // Monthly date ranges
+  const currentMonthStart = startOfMonth(now);
+  const currentMonthEnd = endOfMonth(now);
+  const previousMonthStart = startOfMonth(subMonths(now, 1));
+  const previousMonthEnd = endOfMonth(subMonths(now, 1));
 
   // Fetch 6 months of transactions for comparison
   const { transactions, isLoading: txLoading } = useTransactions({
@@ -102,10 +133,44 @@ export const useFinancialReview = () => {
 
   const isLoading = txLoading || budgetsLoading || goalsLoading || loansLoading || walletsLoading || billsLoading;
 
-  // Calculate quarterly recurring expenses (3 months)
-  const quarterlyRecurringExpenses = totalMonthlyBills * 3;
+  // Helper function to calculate stats for a period
+  const calcPeriodStats = (txs: typeof transactions, recurringExpenses: number) => {
+    const income = txs.filter((t) => t.type === "income").reduce((sum, t) => sum + Number(t.amount), 0);
+    const transactionExpenses = txs.filter((t) => t.type === "expense").reduce((sum, t) => sum + Number(t.amount), 0);
+    const expenses = transactionExpenses + recurringExpenses;
+    const savings = income - expenses;
+    const savingsRate = income > 0 ? (savings / income) * 100 : 0;
+    return { income, expenses, savings, savingsRate };
+  };
 
-  // Calculate quarterly data (including recurring expenses)
+  // Calculate monthly data
+  const monthlyComparison = useMemo((): MonthlyComparison => {
+    const currentMonthTx = transactions.filter((t) => {
+      const date = new Date(t.transaction_date);
+      return date >= currentMonthStart && date <= currentMonthEnd;
+    });
+
+    const previousMonthTx = transactions.filter((t) => {
+      const date = new Date(t.transaction_date);
+      return date >= previousMonthStart && date <= previousMonthEnd;
+    });
+
+    const current = calcPeriodStats(currentMonthTx, totalMonthlyBills);
+    const previous = calcPeriodStats(previousMonthTx, totalMonthlyBills);
+
+    return {
+      currentMonth: current,
+      previousMonth: previous,
+      changes: {
+        income: previous.income > 0 ? ((current.income - previous.income) / previous.income) * 100 : 0,
+        expenses: previous.expenses > 0 ? ((current.expenses - previous.expenses) / previous.expenses) * 100 : 0,
+        savings: previous.savings !== 0 ? ((current.savings - previous.savings) / Math.abs(previous.savings)) * 100 : 0,
+        savingsRate: current.savingsRate - previous.savingsRate,
+      },
+    };
+  }, [transactions, currentMonthStart, currentMonthEnd, previousMonthStart, previousMonthEnd, totalMonthlyBills]);
+
+  // Calculate quarterly data
   const quarterlyComparison = useMemo((): QuarterlyComparison => {
     const currentQuarterTx = transactions.filter((t) => {
       const date = new Date(t.transaction_date);
@@ -117,18 +182,14 @@ export const useFinancialReview = () => {
       return date >= previousQuarterStart && date <= previousQuarterEnd;
     });
 
-    const calcStats = (txs: typeof transactions, includeRecurring = false) => {
-      const income = txs.filter((t) => t.type === "income").reduce((sum, t) => sum + Number(t.amount), 0);
-      const transactionExpenses = txs.filter((t) => t.type === "expense").reduce((sum, t) => sum + Number(t.amount), 0);
-      // Add recurring expenses for current quarter calculations
-      const expenses = includeRecurring ? transactionExpenses + quarterlyRecurringExpenses : transactionExpenses;
-      const savings = income - expenses;
-      const savingsRate = income > 0 ? (savings / income) * 100 : 0;
-      return { income, expenses, savings, savingsRate };
-    };
+    // Calculate months elapsed in current quarter for proper recurring expense calculation
+    const monthsInCurrentQuarter = Math.min(
+      3,
+      Math.ceil((Math.min(now.getTime(), currentQuarterEnd.getTime()) - currentQuarterStart.getTime()) / (1000 * 60 * 60 * 24 * 30))
+    ) || 1;
 
-    const current = calcStats(currentQuarterTx, true); // Include recurring for current
-    const previous = calcStats(previousQuarterTx, false); // Previous doesn't have recurring data
+    const current = calcPeriodStats(currentQuarterTx, totalMonthlyBills * monthsInCurrentQuarter);
+    const previous = calcPeriodStats(previousQuarterTx, totalMonthlyBills * 3); // Full 3 months for previous quarter
 
     return {
       currentQuarter: current,
@@ -140,7 +201,7 @@ export const useFinancialReview = () => {
         savingsRate: current.savingsRate - previous.savingsRate,
       },
     };
-  }, [transactions, currentQuarterStart, currentQuarterEnd, previousQuarterStart, previousQuarterEnd, quarterlyRecurringExpenses]);
+  }, [transactions, currentQuarterStart, currentQuarterEnd, previousQuarterStart, previousQuarterEnd, totalMonthlyBills, now]);
 
   // Calculate financial health score
   const healthScore = useMemo((): FinancialHealthScore => {
@@ -415,12 +476,14 @@ export const useFinancialReview = () => {
   }, [goals, now]);
 
   const quarterLabel = `Q${Math.ceil((now.getMonth() + 1) / 3)} ${now.getFullYear()}`;
+  const monthLabel = format(now, "MMMM yyyy");
 
   return {
     isLoading,
     reviewData: {
       healthScore,
       quarterComparison: quarterlyComparison,
+      monthlyComparison,
       wins,
       gaps,
       actionItems,
@@ -428,6 +491,7 @@ export const useFinancialReview = () => {
       totalDebt,
       goalsSummary,
       quarterLabel,
+      monthLabel,
       generatedAt: format(now, "dd MMM yyyy, HH:mm"),
     } as QuarterlyReviewData,
   };
