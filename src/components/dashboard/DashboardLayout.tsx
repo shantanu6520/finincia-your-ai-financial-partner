@@ -58,7 +58,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     <div className="min-h-screen bg-background">
       {/* Mobile Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b border-border h-16 flex items-center justify-between px-4">
-        <Link to="/dashboard">
+        <Link to="/">
           <img src={fininciaLogo} alt="FININCIA" className="h-8 invert" />
         </Link>
         <button
@@ -78,7 +78,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="h-16 lg:h-20 flex items-center justify-center px-6 border-b border-border">
-            <Link to="/dashboard">
+            <Link to="/">
               <img src={fininciaLogo} alt="FININCIA" className="h-8 lg:h-10 invert" />
             </Link>
           </div>
