@@ -66,10 +66,10 @@ const Navbar = () => {
             <Button 
               variant="ghost" 
               size="sm"
-              className={`font-medium tracking-wide ${
+              className={`font-medium tracking-wide transition-all duration-300 ${
                 isScrolled 
-                  ? 'text-foreground hover:bg-secondary' 
-                  : 'text-primary-foreground hover:bg-primary-foreground/10'
+                  ? 'text-foreground hover:bg-foreground hover:text-background' 
+                  : 'text-primary-foreground hover:bg-primary-foreground hover:text-primary'
               }`}
             >
               Log In
