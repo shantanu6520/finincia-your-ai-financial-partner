@@ -3,9 +3,12 @@ import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, Plus } 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import AIInsightsCard from "@/components/dashboard/AIInsightsCard";
 import { useWallets } from "@/hooks/useWallets";
 import { useTransactions } from "@/hooks/useTransactions";
 import { useProfile } from "@/hooks/useProfile";
+import { useBudgets } from "@/hooks/useBudgets";
+import { useGoals } from "@/hooks/useGoals";
 import { Link } from "react-router-dom";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
@@ -21,6 +24,8 @@ const currencySymbols: Record<string, string> = {
 const Dashboard = () => {
   const { profile } = useProfile();
   const { wallets, totalBalance, isLoading: walletsLoading } = useWallets();
+  const { budgets } = useBudgets();
+  const { goals } = useGoals();
   
   // Get current month transactions
   const now = new Date();
@@ -42,7 +47,25 @@ const Dashboard = () => {
   };
 
   const savings = totalIncome - totalExpenses;
-  const savingsRate = totalIncome > 0 ? ((savings / totalIncome) * 100).toFixed(1) : "0";
+  const savingsRate = totalIncome > 0 ? Number(((savings / totalIncome) * 100).toFixed(1)) : 0;
+
+  // Calculate budget utilization
+  const budgetUtilization = budgets.length > 0 
+    ? budgets.reduce((sum, b) => {
+        const spent = transactions
+          .filter(t => t.type === "expense" && t.category_id === b.category_id)
+          .reduce((s, t) => s + Number(t.amount), 0);
+        return sum + (spent / Number(b.amount)) * 100;
+      }, 0) / budgets.length
+    : undefined;
+
+  // Calculate goal progress
+  const goalProgress = goals.length > 0
+    ? goals
+        .filter(g => g.status === "active")
+        .reduce((sum, g) => sum + (Number(g.current_amount) / Number(g.target_amount)) * 100, 0) / 
+        goals.filter(g => g.status === "active").length
+    : undefined;
 
   // Prepare chart data (last 7 days)
   const last7Days = Array.from({ length: 7 }, (_, i) => {
@@ -175,6 +198,83 @@ const Dashboard = () => {
               </CardContent>
             </Card>
           </motion.div>
+        </div>
+
+        {/* AI Insights */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1">
+            <AIInsightsCard
+              totalIncome={totalIncome}
+              totalExpenses={totalExpenses}
+              totalBalance={totalBalance}
+              savingsRate={savingsRate}
+              topCategory={categoryData[0]}
+              goalProgress={goalProgress}
+              budgetUtilization={budgetUtilization}
+            />
+          </div>
+          
+          {/* Quick Stats */}
+          <div className="lg:col-span-2 grid grid-cols-2 gap-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+            >
+              <Card className="border-border/50 h-full">
+                <CardContent className="p-4 flex flex-col justify-center h-full">
+                  <p className="text-xs text-muted-foreground">Active Budgets</p>
+                  <p className="text-2xl font-bold">{budgets.length}</p>
+                  <Link to="/budgets" className="text-xs text-primary hover:underline mt-1">
+                    Manage Budgets →
+                  </Link>
+                </CardContent>
+              </Card>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Card className="border-border/50 h-full">
+                <CardContent className="p-4 flex flex-col justify-center h-full">
+                  <p className="text-xs text-muted-foreground">Active Goals</p>
+                  <p className="text-2xl font-bold">{goals.filter(g => g.status === "active").length}</p>
+                  <Link to="/goals" className="text-xs text-primary hover:underline mt-1">
+                    View Goals →
+                  </Link>
+                </CardContent>
+              </Card>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+            >
+              <Card className="border-border/50 h-full">
+                <CardContent className="p-4 flex flex-col justify-center h-full">
+                  <p className="text-xs text-muted-foreground">This Month</p>
+                  <p className="text-2xl font-bold">{transactions.length}</p>
+                  <p className="text-xs text-muted-foreground">transactions</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Card className="border-border/50 h-full">
+                <CardContent className="p-4 flex flex-col justify-center h-full">
+                  <p className="text-xs text-muted-foreground">AI Coach</p>
+                  <p className="text-lg font-semibold">Get Insights</p>
+                  <Link to="/ai-coach" className="text-xs text-primary hover:underline mt-1">
+                    Start Chat →
+                  </Link>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
         </div>
 
         {/* Charts Row */}
