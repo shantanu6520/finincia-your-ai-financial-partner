@@ -362,19 +362,47 @@ const LoanStrategist = () => {
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-primary" />
                   AI Loan Advisor
+                  <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-normal">
+                    RAG Powered
+                  </span>
                 </CardTitle>
+                <p className="text-xs text-muted-foreground">
+                  Retrieval-Augmented Generation with curated financial knowledge
+                </p>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col overflow-hidden p-4 pt-0">
                 <div className="flex-1 overflow-y-auto space-y-3 mb-4">
                   {messages.length === 0 ? (
-                    <div className="text-center text-muted-foreground text-sm py-8">
-                      <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                      <p>Ask me about:</p>
-                      <ul className="mt-2 space-y-1">
-                        <li>• Best repayment strategy</li>
-                        <li>• Prepayment calculations</li>
-                        <li>• Interest savings tips</li>
-                      </ul>
+                    <div className="text-center text-muted-foreground text-sm py-6">
+                      <div className="relative inline-block mb-4">
+                        <MessageSquare className="w-10 h-10 opacity-50" />
+                        <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white text-[8px] px-1.5 py-0.5 rounded-full">
+                          RAG
+                        </div>
+                      </div>
+                      <p className="font-medium mb-2">Expert Knowledge Base</p>
+                      <p className="text-xs mb-4">AI retrieves relevant strategies based on your query</p>
+                      <div className="text-left bg-secondary/50 rounded-lg p-3 space-y-2">
+                        <p className="text-xs font-medium">Try asking:</p>
+                        <ul className="space-y-1.5 text-xs">
+                          <li className="flex items-center gap-2">
+                            <span className="w-1 h-1 rounded-full bg-primary"></span>
+                            "What's the best strategy for my loans?"
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <span className="w-1 h-1 rounded-full bg-primary"></span>
+                            "Should I prepay or reduce tenure?"
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <span className="w-1 h-1 rounded-full bg-primary"></span>
+                            "How to negotiate lower interest rate?"
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <span className="w-1 h-1 rounded-full bg-primary"></span>
+                            "Avalanche vs snowball method?"
+                          </li>
+                        </ul>
+                      </div>
                     </div>
                   ) : (
                     messages.map((msg, i) => (
