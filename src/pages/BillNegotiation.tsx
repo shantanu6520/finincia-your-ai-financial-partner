@@ -4,12 +4,10 @@ import {
   Receipt, 
   Plus, 
   Trash2, 
-  Phone, 
-  CheckCircle, 
+  Pencil, 
   IndianRupee,
   Sparkles,
   MessageSquare,
-  TrendingDown,
   Calendar
 } from "lucide-react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
@@ -47,11 +45,17 @@ const categories = [
 
 const BillNegotiation = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isSavingsDialogOpen, setIsSavingsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedBillId, setSelectedBillId] = useState<string | null>(null);
-  const [savingsAmount, setSavingsAmount] = useState("");
   const [aiInput, setAIInput] = useState("");
   const [newBill, setNewBill] = useState<CreateBillInput>({
+    name: "",
+    provider: "",
+    amount: 0,
+    frequency: "monthly",
+    category: "",
+  });
+  const [editBill, setEditBill] = useState<CreateBillInput>({
     name: "",
     provider: "",
     amount: 0,
@@ -64,13 +68,12 @@ const BillNegotiation = () => {
     isLoading,
     totalMonthlyBills,
     totalAnnualBills,
-    totalSavingsAchieved,
-    negotiatedCount,
     getAnnualCost,
     createBill,
+    updateBill,
     deleteBill,
-    markAsNegotiated,
     isCreating,
+    isUpdating,
   } = useRecurringBills();
 
   const { transactions, totalExpenses } = useTransactions();
@@ -100,12 +103,18 @@ const BillNegotiation = () => {
     setIsAddDialogOpen(false);
   };
 
-  const handleMarkNegotiated = () => {
-    if (!selectedBillId) return;
-    markAsNegotiated({ id: selectedBillId, savings: Number(savingsAmount) || 0 });
-    setIsSavingsDialogOpen(false);
+  const handleEditBill = () => {
+    if (!selectedBillId || !editBill.name || editBill.amount <= 0) return;
+    updateBill({
+      id: selectedBillId,
+      name: editBill.name,
+      provider: editBill.provider || null,
+      amount: editBill.amount,
+      frequency: editBill.frequency,
+      category: editBill.category || null,
+    });
+    setIsEditDialogOpen(false);
     setSelectedBillId(null);
-    setSavingsAmount("");
   };
 
   const handleAISubmit = (e: React.FormEvent) => {
@@ -113,12 +122,6 @@ const BillNegotiation = () => {
     if (!aiInput.trim() || isAILoading) return;
     sendMessage(aiInput.trim());
     setAIInput("");
-  };
-
-  const generateNegotiationPrompt = (bill: typeof bills[0]) => {
-    sendMessage(
-      `Generate a negotiation script for my ${bill.name} bill from ${bill.provider || "the provider"}. Current amount: ₹${bill.amount}/${bill.frequency}. I want to reduce this bill.`
-    );
   };
 
   const formatCurrency = (amount: number) => {
@@ -229,7 +232,7 @@ const BillNegotiation = () => {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
@@ -252,19 +255,6 @@ const BillNegotiation = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">Annual Cost</p>
                   <p className="text-xl font-bold text-foreground">{formatCurrency(totalAnnualBills)}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-500/10 rounded-lg">
-                  <TrendingDown className="w-5 h-5 text-green-500" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Saved</p>
-                  <p className="text-xl font-bold text-green-500">{formatCurrency(totalSavingsAchieved)}</p>
                 </div>
               </div>
             </CardContent>
@@ -296,12 +286,6 @@ const BillNegotiation = () => {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className="font-semibold text-foreground">{bill.name}</h3>
-                            {bill.is_negotiated && (
-                              <Badge variant="secondary" className="text-green-500">
-                                <CheckCircle className="w-3 h-3 mr-1" />
-                                Negotiated
-                              </Badge>
-                            )}
                           </div>
                           <p className="text-sm text-muted-foreground">
                             {bill.provider || "Unknown provider"} • {bill.category || "Uncategorized"}
@@ -315,38 +299,27 @@ const BillNegotiation = () => {
                               <p className="text-xs text-muted-foreground">Annual</p>
                               <p className="font-semibold">{formatCurrency(getAnnualCost(bill))}</p>
                             </div>
-                            {bill.savings_achieved > 0 && (
-                              <div>
-                                <p className="text-xs text-muted-foreground">Saved</p>
-                                <p className="font-semibold text-green-500">
-                                  {formatCurrency(bill.savings_achieved)}
-                                </p>
-                              </div>
-                            )}
                           </div>
                         </div>
                         <div className="flex flex-col gap-2">
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => generateNegotiationPrompt(bill)}
+                            onClick={() => {
+                              setSelectedBillId(bill.id);
+                              setIsEditDialogOpen(true);
+                              setEditBill({
+                                name: bill.name,
+                                provider: bill.provider || "",
+                                amount: bill.amount,
+                                frequency: bill.frequency,
+                                category: bill.category || "",
+                              });
+                            }}
                           >
-                            <Phone className="w-3 h-3 mr-1" />
-                            Script
+                            <Pencil className="w-3 h-3 mr-1" />
+                            Edit
                           </Button>
-                          {!bill.is_negotiated && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                setSelectedBillId(bill.id);
-                                setIsSavingsDialogOpen(true);
-                              }}
-                            >
-                              <CheckCircle className="w-3 h-3 mr-1" />
-                              Done
-                            </Button>
-                          )}
                           <Button
                             variant="ghost"
                             size="sm"
@@ -410,7 +383,7 @@ const BillNegotiation = () => {
                 <Textarea
                   value={aiInput}
                   onChange={(e) => setAIInput(e.target.value)}
-                  placeholder="Ask for negotiation help..."
+                  placeholder="Ask for recurring spending analysis..."
                   className="min-h-[40px] max-h-20 resize-none text-sm"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
@@ -427,27 +400,77 @@ const BillNegotiation = () => {
           </Card>
         </div>
 
-        {/* Savings Dialog */}
-        <Dialog open={isSavingsDialogOpen} onOpenChange={setIsSavingsDialogOpen}>
+        {/* Edit Bill Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Record Savings</DialogTitle>
+              <DialogTitle>Edit Recurring Bill</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                How much did you save through negotiation? (monthly amount)
-              </p>
               <div>
-                <Label>Monthly Savings (₹)</Label>
+                <Label>Bill Name</Label>
                 <Input
-                  type="number"
-                  value={savingsAmount}
-                  onChange={(e) => setSavingsAmount(e.target.value)}
-                  placeholder="0"
+                  value={editBill.name}
+                  onChange={(e) => setEditBill({ ...editBill, name: e.target.value })}
+                  placeholder="e.g., Netflix, Electricity"
                 />
               </div>
-              <Button onClick={handleMarkNegotiated} className="w-full">
-                Record Savings
+              <div>
+                <Label>Provider</Label>
+                <Input
+                  value={editBill.provider || ""}
+                  onChange={(e) => setEditBill({ ...editBill, provider: e.target.value })}
+                  placeholder="e.g., Netflix Inc, BESCOM"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Amount (₹)</Label>
+                  <Input
+                    type="number"
+                    value={editBill.amount || ""}
+                    onChange={(e) => setEditBill({ ...editBill, amount: Number(e.target.value) })}
+                  />
+                </div>
+                <div>
+                  <Label>Frequency</Label>
+                  <Select
+                    value={editBill.frequency}
+                    onValueChange={(value) => setEditBill({ ...editBill, frequency: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {frequencies.map((freq) => (
+                        <SelectItem key={freq.value} value={freq.value}>
+                          {freq.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div>
+                <Label>Category</Label>
+                <Select
+                  value={editBill.category || ""}
+                  onValueChange={(value) => setEditBill({ ...editBill, category: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat} value={cat.toLowerCase()}>
+                        {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button onClick={handleEditBill} disabled={isUpdating} className="w-full">
+                {isUpdating ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </DialogContent>
