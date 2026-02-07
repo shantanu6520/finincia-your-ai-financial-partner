@@ -66,7 +66,7 @@ const HeroSection = () => {
             <Button 
               size="xl"
               variant="outline"
-              className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 px-8"
+              className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground hover:text-primary hover:border-primary-foreground transition-all duration-300 px-8"
             >
               See How It Works
             </Button>
