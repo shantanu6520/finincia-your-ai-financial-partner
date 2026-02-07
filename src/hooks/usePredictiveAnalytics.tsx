@@ -133,30 +133,60 @@ export const usePredictiveAnalytics = () => {
     return sources.sort((a, b) => b.amount - a.amount);
   }, [transactions]);
 
-  // Analyze expense destinations and patterns
+  // Helper to get monthly equivalent of recurring bills
+  const getMonthlyEquivalent = (amount: number, frequency: string): number => {
+    switch (frequency) {
+      case "weekly": return amount * 4.33;
+      case "quarterly": return amount / 3;
+      case "yearly": return amount / 12;
+      default: return amount;
+    }
+  };
+
+  // Analyze expense destinations and patterns (includes recurring bills)
   const expenseAnalysis = useMemo(() => {
     const expenseTransactions = transactions.filter((t) => t.type === "expense");
-    const totalExpenses = expenseTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
     
-    // Group by category
-    const byCategory: Record<string, { amounts: number[]; dates: string[] }> = {};
+    // Calculate transaction expenses total
+    const transactionExpensesTotal = expenseTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
+    
+    // Calculate recurring bills total (monthly equivalent, scaled to 90-day period = 3 months)
+    const recurringExpensesTotal = totalMonthlyBills * 3;
+    
+    // Total expenses includes both
+    const totalExpenses = transactionExpensesTotal + recurringExpensesTotal;
+    
+    // Group transactions by category
+    const byCategory: Record<string, { amounts: number[]; dates: string[]; hasRecurring: boolean; recurringAmount: number }> = {};
+    
     expenseTransactions.forEach((t) => {
       const cat = t.category?.name || "Other";
-      if (!byCategory[cat]) byCategory[cat] = { amounts: [], dates: [] };
+      if (!byCategory[cat]) byCategory[cat] = { amounts: [], dates: [], hasRecurring: false, recurringAmount: 0 };
       byCategory[cat].amounts.push(Number(t.amount));
       byCategory[cat].dates.push(t.transaction_date);
     });
+    
+    // Add recurring bills to category breakdown (scaled to 3 months to match 90-day transaction window)
+    recurringBills.forEach((bill) => {
+      const cat = bill.category || "Bills & Utilities";
+      if (!byCategory[cat]) byCategory[cat] = { amounts: [], dates: [], hasRecurring: false, recurringAmount: 0 };
+      byCategory[cat].hasRecurring = true;
+      byCategory[cat].recurringAmount += getMonthlyEquivalent(Number(bill.amount), bill.frequency) * 3;
+    });
 
     const destinations: ExpenseDestination[] = Object.entries(byCategory).map(([category, data]) => {
-      const total = data.amounts.reduce((a, b) => a + b, 0);
+      const transactionTotal = data.amounts.reduce((a, b) => a + b, 0);
+      const total = transactionTotal + data.recurringAmount;
       const percentage = totalExpenses > 0 ? (total / totalExpenses) * 100 : 0;
       
-      // Detect if recurring (multiple transactions with similar amounts)
-      const avgAmount = total / data.amounts.length;
-      const variance = data.amounts.reduce((sum, a) => sum + Math.abs(a - avgAmount), 0) / data.amounts.length;
-      const isRecurring = data.amounts.length >= 2 && variance < avgAmount * 0.2;
+      // Mark as recurring if has recurring bills or transaction pattern suggests recurring
+      const avgAmount = data.amounts.length > 0 ? transactionTotal / data.amounts.length : 0;
+      const variance = data.amounts.length > 0 
+        ? data.amounts.reduce((sum, a) => sum + Math.abs(a - avgAmount), 0) / data.amounts.length 
+        : 0;
+      const isRecurring = data.hasRecurring || (data.amounts.length >= 2 && variance < avgAmount * 0.2);
 
-      // Detect trend
+      // Detect trend (based on transactions only, recurring is stable by nature)
       let trend: "increasing" | "stable" | "decreasing" = "stable";
       if (data.amounts.length >= 3) {
         const recent = data.amounts.slice(-2);
@@ -171,7 +201,7 @@ export const usePredictiveAnalytics = () => {
     });
 
     return destinations.sort((a, b) => b.amount - a.amount);
-  }, [transactions]);
+  }, [transactions, recurringBills, totalMonthlyBills]);
 
   // Generate smart insights
   const cashFlowInsights = useMemo((): CashFlowInsights => {
@@ -383,7 +413,7 @@ export const usePredictiveAnalytics = () => {
     });
   }, [budgets, now]);
 
-  // Anomaly Detection
+  // Anomaly Detection (includes recurring bills)
   const anomalies = useMemo((): SpendingAnomaly[] => {
     const detected: SpendingAnomaly[] = [];
     
@@ -397,13 +427,14 @@ export const usePredictiveAnalytics = () => {
              t.type === "expense"
     );
 
-    // Category spending comparison
-    const categorySpending: Record<string, { current: number; previous: number; name: string }> = {};
+    // Category spending comparison (includes recurring bills)
+    const categorySpending: Record<string, { current: number; previous: number; name: string; hasRecurring: boolean }> = {};
     
+    // Add transaction expenses
     last30Days.forEach((t) => {
       const catName = t.category?.name || "Other";
       if (!categorySpending[catName]) {
-        categorySpending[catName] = { current: 0, previous: 0, name: catName };
+        categorySpending[catName] = { current: 0, previous: 0, name: catName, hasRecurring: false };
       }
       categorySpending[catName].current += Number(t.amount);
     });
@@ -411,13 +442,28 @@ export const usePredictiveAnalytics = () => {
     prev30Days.forEach((t) => {
       const catName = t.category?.name || "Other";
       if (!categorySpending[catName]) {
-        categorySpending[catName] = { current: 0, previous: 0, name: catName };
+        categorySpending[catName] = { current: 0, previous: 0, name: catName, hasRecurring: false };
       }
       categorySpending[catName].previous += Number(t.amount);
     });
+    
+    // Add recurring bills to current month spending (monthly equivalent)
+    recurringBills.forEach((bill) => {
+      const catName = bill.category || "Bills & Utilities";
+      if (!categorySpending[catName]) {
+        categorySpending[catName] = { current: 0, previous: 0, name: catName, hasRecurring: false };
+      }
+      categorySpending[catName].current += getMonthlyEquivalent(Number(bill.amount), bill.frequency);
+      categorySpending[catName].hasRecurring = true;
+      // Also add to previous (recurring is consistent)
+      categorySpending[catName].previous += getMonthlyEquivalent(Number(bill.amount), bill.frequency);
+    });
 
-    // Detect category spending spikes
+    // Detect category spending spikes (exclude recurring-only categories from spike detection)
     Object.values(categorySpending).forEach((cat, index) => {
+      // Skip pure recurring categories for spike detection since they're stable
+      if (cat.hasRecurring && cat.current === cat.previous) return;
+      
       if (cat.previous > 0) {
         const percentageChange = ((cat.current - cat.previous) / cat.previous) * 100;
         if (percentageChange > 50) {
@@ -432,7 +478,7 @@ export const usePredictiveAnalytics = () => {
             amount: cat.current,
           });
         }
-      } else if (cat.current > 1000) {
+      } else if (cat.current > 1000 && !cat.hasRecurring) {
         detected.push({
           id: `new-${index}`,
           type: "unusual_category",
@@ -441,6 +487,22 @@ export const usePredictiveAnalytics = () => {
           description: `You started spending in ${cat.name.toLowerCase()} this month: ₹${Math.round(cat.current)}.`,
           categoryName: cat.name,
           amount: cat.current,
+        });
+      }
+    });
+    
+    // Detect high recurring bills as potential savings opportunities
+    recurringBills.forEach((bill, index) => {
+      const monthlyAmount = getMonthlyEquivalent(Number(bill.amount), bill.frequency);
+      if (monthlyAmount > 2000 && !bill.is_negotiated) {
+        detected.push({
+          id: `recurring-high-${index}`,
+          type: "frequency_change",
+          severity: "info",
+          title: `High recurring: ${bill.name}`,
+          description: `${bill.name} costs ₹${Math.round(monthlyAmount)}/month. Consider negotiating or reviewing this subscription.`,
+          categoryName: bill.category || "Bills & Utilities",
+          amount: monthlyAmount,
         });
       }
     });

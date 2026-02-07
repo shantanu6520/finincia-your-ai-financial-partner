@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, Plus, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -92,17 +93,38 @@ const Dashboard = () => {
     };
   });
 
-  // Category breakdown
-  const categoryBreakdown = transactions
-    .filter((t) => t.type === "expense" && t.category)
-    .reduce((acc, t) => {
-      const categoryName = t.category?.name || "Other";
-      acc[categoryName] = (acc[categoryName] || 0) + Number(t.amount);
-      return acc;
-    }, {} as Record<string, number>);
+  // Category breakdown - includes both transactions and recurring bills
+  const categoryBreakdown = useMemo(() => {
+    const breakdown: Record<string, number> = {};
+    
+    // Add transaction expenses
+    transactions
+      .filter((t) => t.type === "expense" && t.category)
+      .forEach((t) => {
+        const categoryName = t.category?.name || "Other";
+        breakdown[categoryName] = (breakdown[categoryName] || 0) + Number(t.amount);
+      });
+    
+    // Add recurring bills (with monthly equivalent)
+    const getMonthlyEquivalent = (amount: number, frequency: string): number => {
+      switch (frequency) {
+        case "weekly": return amount * 4.33;
+        case "quarterly": return amount / 3;
+        case "yearly": return amount / 12;
+        default: return amount;
+      }
+    };
+    
+    recurringBills.forEach((bill) => {
+      const categoryName = bill.category || "Bills & Utilities";
+      breakdown[categoryName] = (breakdown[categoryName] || 0) + getMonthlyEquivalent(Number(bill.amount), bill.frequency);
+    });
+    
+    return breakdown;
+  }, [transactions, recurringBills]);
 
-  const categoryData = Object.entries(categoryBreakdown)
-    .map(([name, amount]) => ({ name, amount }))
+  const categoryData: { name: string; amount: number }[] = Object.entries(categoryBreakdown)
+    .map(([name, amount]) => ({ name, amount: Number(amount) }))
     .sort((a, b) => b.amount - a.amount)
     .slice(0, 5);
 
