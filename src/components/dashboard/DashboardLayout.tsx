@@ -76,7 +76,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="h-16 lg:h-20 flex items-center px-6 border-b border-border">
+          <div className="h-16 lg:h-20 flex items-center justify-center px-6 border-b border-border">
             <Link to="/dashboard">
               <img src={fininciaLogo} alt="FININCIA" className="h-8 lg:h-10 invert" />
             </Link>
