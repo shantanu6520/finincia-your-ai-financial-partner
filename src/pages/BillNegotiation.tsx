@@ -5,7 +5,6 @@ import {
   Plus, 
   Trash2, 
   Phone, 
-  Mail, 
   CheckCircle, 
   IndianRupee,
   Sparkles,
@@ -259,19 +258,6 @@ const BillNegotiation = () => {
               </div>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-500/10 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-blue-500" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Negotiated</p>
-                  <p className="text-xl font-bold text-foreground">{negotiatedCount} / {bills.length}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -373,19 +359,18 @@ const BillNegotiation = () => {
             <CardTitle className="text-lg flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-primary" />
               AI Recurring Spend Analyst
+              <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
+                RAG Powered
+              </Badge>
             </CardTitle>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col overflow-hidden p-4 pt-0">
               <div className="flex-1 overflow-y-auto space-y-3 mb-4">
                 {messages.length === 0 ? (
                   <div className="text-center text-muted-foreground text-sm py-8">
-                    <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    <p>Click "Script" on any bill to get:</p>
-                    <ul className="mt-2 space-y-1 text-left max-w-[200px] mx-auto">
-                      <li>• <Phone className="w-3 h-3 inline" /> Call scripts</li>
-                      <li>• <Mail className="w-3 h-3 inline" /> Email templates</li>
-                      <li>• Retention offer tips</li>
-                    </ul>
+                    <Sparkles className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                    <p>Ask me anything about optimizing</p>
+                    <p>your recurring expenses</p>
                   </div>
                 ) : (
                   messages.map((msg, i) => (
