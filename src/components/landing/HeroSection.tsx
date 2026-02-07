@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, TrendingUp, Shield, Brain } from "lucide-react";
+import { Link } from "react-router-dom";
 import fininciaLogo from "@/assets/finincia-logo.png";
 
 const HeroSection = () => {
@@ -56,20 +57,24 @@ const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
           >
-            <Button 
-              size="xl" 
-              className="group bg-primary-foreground text-primary hover:bg-primary-foreground/90 px-8"
-            >
-              Start Free Trial
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button 
-              size="xl"
-              variant="outline"
-              className="border-primary-foreground text-primary-foreground bg-primary-foreground/10 hover:bg-primary-foreground hover:text-primary transition-all duration-300 px-8"
-            >
-              See How It Works
-            </Button>
+            <Link to="/auth">
+              <Button 
+                size="xl" 
+                className="group bg-primary-foreground text-primary hover:bg-primary-foreground/90 px-8"
+              >
+                Start Free Trial
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+            <a href="#how-it-works">
+              <Button 
+                size="xl"
+                variant="outline"
+                className="border-primary-foreground text-primary-foreground bg-primary-foreground/10 hover:bg-primary-foreground hover:text-primary transition-all duration-300 px-8"
+              >
+                See How It Works
+              </Button>
+            </a>
           </motion.div>
 
           {/* Trust indicators */}
