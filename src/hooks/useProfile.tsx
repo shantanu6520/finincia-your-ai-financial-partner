@@ -14,8 +14,6 @@ export interface Profile {
   created_at: string;
   updated_at: string;
   // Notification settings
-  whatsapp_number?: string | null;
-  whatsapp_enabled?: boolean | null;
   email_reports_enabled?: boolean | null;
   notification_frequency?: string | null;
   budget_alert_threshold?: number | null;
