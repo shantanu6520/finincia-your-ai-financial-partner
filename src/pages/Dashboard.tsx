@@ -1,17 +1,19 @@
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, Plus } from "lucide-react";
+import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, Plus, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import AIInsightsCard from "@/components/dashboard/AIInsightsCard";
 import { useWallets } from "@/hooks/useWallets";
 import { useTransactions } from "@/hooks/useTransactions";
+import { useRecurringBills } from "@/hooks/useRecurringBills";
 import { useProfile } from "@/hooks/useProfile";
 import { useBudgets } from "@/hooks/useBudgets";
 import { useGoals } from "@/hooks/useGoals";
 import { Link } from "react-router-dom";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
+import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const currencySymbols: Record<string, string> = {
   INR: "₹",
@@ -26,19 +28,24 @@ const Dashboard = () => {
   const { wallets, totalBalance, isLoading: walletsLoading } = useWallets();
   const { budgets } = useBudgets();
   const { goals } = useGoals();
+  const { bills: recurringBills, totalMonthlyBills, isLoading: billsLoading } = useRecurringBills();
+  const recurringBillsCount = recurringBills.length;
   
   // Get current month transactions
   const now = new Date();
   const startDate = format(startOfMonth(now), "yyyy-MM-dd");
   const endDate = format(endOfMonth(now), "yyyy-MM-dd");
   
-  const { transactions, totalIncome, totalExpenses, isLoading: transactionsLoading } = useTransactions({
+  const { transactions, totalIncome, totalExpenses: transactionExpenses, isLoading: transactionsLoading } = useTransactions({
     startDate,
     endDate,
   });
 
+  // Combine transaction expenses with recurring bills for total expenses
+  const totalExpenses = transactionExpenses + totalMonthlyBills;
+
   const currencySymbol = currencySymbols[profile?.currency || "INR"] || "₹";
-  const isLoading = walletsLoading || transactionsLoading;
+  const isLoading = walletsLoading || transactionsLoading || billsLoading;
 
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat("en-IN", {
@@ -167,11 +174,34 @@ const Dashboard = () => {
             <Card className="border-border/50">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Monthly Expenses</CardTitle>
-                <ArrowDownRight className="w-4 h-4 text-muted-foreground" />
+                <TooltipProvider>
+                  <UITooltip>
+                    <TooltipTrigger>
+                      <div className="flex items-center gap-1">
+                        {recurringBillsCount > 0 && (
+                          <RefreshCw className="w-3 h-3 text-primary" />
+                        )}
+                        <ArrowDownRight className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <div className="text-xs">
+                        <p>Transactions: {currencySymbol}{formatAmount(transactionExpenses)}</p>
+                        {recurringBillsCount > 0 && (
+                          <p>Recurring Bills: {currencySymbol}{formatAmount(totalMonthlyBills)}</p>
+                        )}
+                      </div>
+                    </TooltipContent>
+                  </UITooltip>
+                </TooltipProvider>
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-bold font-display">{currencySymbol}{formatAmount(totalExpenses)}</p>
-                <p className="text-xs text-muted-foreground mt-1">This month</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {recurringBillsCount > 0 
+                    ? `Includes ${recurringBillsCount} recurring bill${recurringBillsCount > 1 ? 's' : ''}` 
+                    : 'This month'}
+                </p>
               </CardContent>
             </Card>
           </motion.div>

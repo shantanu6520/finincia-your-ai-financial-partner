@@ -4,6 +4,7 @@ import { useBudgets } from "./useBudgets";
 import { useGoals } from "./useGoals";
 import { useLoans } from "./useLoans";
 import { useWallets } from "./useWallets";
+import { useRecurringBills } from "./useRecurringBills";
 import { format, subMonths, startOfQuarter, endOfQuarter, subQuarters } from "date-fns";
 
 export interface FinancialHealthScore {
@@ -97,10 +98,14 @@ export const useFinancialReview = () => {
   const { goals, loading: goalsLoading } = useGoals();
   const { loans, totalDebt, isLoading: loansLoading } = useLoans();
   const { totalBalance, isLoading: walletsLoading } = useWallets();
+  const { totalMonthlyBills, isLoading: billsLoading } = useRecurringBills();
 
-  const isLoading = txLoading || budgetsLoading || goalsLoading || loansLoading || walletsLoading;
+  const isLoading = txLoading || budgetsLoading || goalsLoading || loansLoading || walletsLoading || billsLoading;
 
-  // Calculate quarterly data
+  // Calculate quarterly recurring expenses (3 months)
+  const quarterlyRecurringExpenses = totalMonthlyBills * 3;
+
+  // Calculate quarterly data (including recurring expenses)
   const quarterlyComparison = useMemo((): QuarterlyComparison => {
     const currentQuarterTx = transactions.filter((t) => {
       const date = new Date(t.transaction_date);
@@ -112,16 +117,18 @@ export const useFinancialReview = () => {
       return date >= previousQuarterStart && date <= previousQuarterEnd;
     });
 
-    const calcStats = (txs: typeof transactions) => {
+    const calcStats = (txs: typeof transactions, includeRecurring = false) => {
       const income = txs.filter((t) => t.type === "income").reduce((sum, t) => sum + Number(t.amount), 0);
-      const expenses = txs.filter((t) => t.type === "expense").reduce((sum, t) => sum + Number(t.amount), 0);
+      const transactionExpenses = txs.filter((t) => t.type === "expense").reduce((sum, t) => sum + Number(t.amount), 0);
+      // Add recurring expenses for current quarter calculations
+      const expenses = includeRecurring ? transactionExpenses + quarterlyRecurringExpenses : transactionExpenses;
       const savings = income - expenses;
       const savingsRate = income > 0 ? (savings / income) * 100 : 0;
       return { income, expenses, savings, savingsRate };
     };
 
-    const current = calcStats(currentQuarterTx);
-    const previous = calcStats(previousQuarterTx);
+    const current = calcStats(currentQuarterTx, true); // Include recurring for current
+    const previous = calcStats(previousQuarterTx, false); // Previous doesn't have recurring data
 
     return {
       currentQuarter: current,
@@ -133,7 +140,7 @@ export const useFinancialReview = () => {
         savingsRate: current.savingsRate - previous.savingsRate,
       },
     };
-  }, [transactions, currentQuarterStart, currentQuarterEnd, previousQuarterStart, previousQuarterEnd]);
+  }, [transactions, currentQuarterStart, currentQuarterEnd, previousQuarterStart, previousQuarterEnd, quarterlyRecurringExpenses]);
 
   // Calculate financial health score
   const healthScore = useMemo((): FinancialHealthScore => {
