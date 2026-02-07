@@ -17,6 +17,7 @@ import AICoach from "./pages/AICoach";
 import LoanStrategist from "./pages/LoanStrategist";
 import BillNegotiation from "./pages/BillNegotiation";
 import Analytics from "./pages/Analytics";
+import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "@/components/dashboard/ProtectedRoute";
 
@@ -110,6 +111,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Analytics />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/reports"
+              element={
+                <ProtectedRoute>
+                  <Reports />
                 </ProtectedRoute>
               }
             />

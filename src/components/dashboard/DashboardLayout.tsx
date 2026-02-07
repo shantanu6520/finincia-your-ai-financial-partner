@@ -15,7 +15,8 @@ import {
   Sparkles,
   Calculator,
   FileText,
-  Activity
+  Activity,
+  ClipboardList
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -33,6 +34,7 @@ const navItems = [
   { icon: PieChart, label: "Budgets", path: "/budgets" },
   { icon: Target, label: "Goals", path: "/goals" },
   { icon: Activity, label: "Analytics", path: "/analytics", isPro: true },
+  { icon: ClipboardList, label: "Reports", path: "/reports", isPro: true },
   { icon: Sparkles, label: "AI Coach", path: "/ai-coach", isPro: true },
   { icon: Calculator, label: "Loan Strategist", path: "/loan-strategist", isPro: true },
   { icon: FileText, label: "Bill Negotiation", path: "/bill-negotiation", isPro: true },
