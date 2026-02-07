@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useTransactions } from "./useTransactions";
 import { useBudgets } from "./useBudgets";
 import { useWallets } from "./useWallets";
-import { format, subDays, addDays, startOfMonth, endOfMonth, differenceInDays } from "date-fns";
+import { format, subDays, addDays, startOfMonth, endOfMonth, differenceInDays, getDate } from "date-fns";
 
 export interface CashFlowForecast {
   date: string;
@@ -11,6 +11,33 @@ export interface CashFlowForecast {
   confidenceLow: number;
   confidenceHigh: number;
   isForecasted: boolean;
+}
+
+export interface IncomeSource {
+  category: string;
+  amount: number;
+  frequency: "one-time" | "weekly" | "monthly" | "irregular";
+  predictedNextDate?: string;
+  trend: "increasing" | "stable" | "decreasing";
+}
+
+export interface ExpenseDestination {
+  category: string;
+  amount: number;
+  percentage: number;
+  trend: "increasing" | "stable" | "decreasing";
+  isRecurring: boolean;
+}
+
+export interface CashFlowInsights {
+  incomeSources: IncomeSource[];
+  expenseDestinations: ExpenseDestination[];
+  recurringIncomeTotal: number;
+  recurringExpenseTotal: number;
+  netRecurringFlow: number;
+  incomePatterns: string[];
+  expensePatterns: string[];
+  predictions: string[];
 }
 
 export interface BudgetPrediction {
@@ -56,9 +83,169 @@ export const usePredictiveAnalytics = () => {
 
   const isLoading = txLoading || budgetsLoading || walletsLoading;
 
-  // Calculate daily averages from historical data
+  // Analyze income sources and patterns
+  const incomeAnalysis = useMemo(() => {
+    const incomeTransactions = transactions.filter((t) => t.type === "income");
+    
+    // Group by category
+    const byCategory: Record<string, { amounts: number[]; dates: string[] }> = {};
+    incomeTransactions.forEach((t) => {
+      const cat = t.category?.name || "Other Income";
+      if (!byCategory[cat]) byCategory[cat] = { amounts: [], dates: [] };
+      byCategory[cat].amounts.push(Number(t.amount));
+      byCategory[cat].dates.push(t.transaction_date);
+    });
+
+    const sources: IncomeSource[] = Object.entries(byCategory).map(([category, data]) => {
+      const total = data.amounts.reduce((a, b) => a + b, 0);
+      const avgAmount = total / data.amounts.length;
+      
+      // Detect frequency pattern
+      let frequency: "one-time" | "weekly" | "monthly" | "irregular" = "irregular";
+      if (data.amounts.length === 1) {
+        frequency = "one-time";
+      } else if (data.amounts.length >= 3) {
+        // Check for monthly pattern (transactions around same day each month)
+        const days = data.dates.map((d) => getDate(new Date(d)));
+        const avgDay = days.reduce((a, b) => a + b, 0) / days.length;
+        const dayVariance = days.reduce((sum, d) => sum + Math.abs(d - avgDay), 0) / days.length;
+        if (dayVariance < 5) frequency = "monthly";
+      }
+
+      // Detect trend
+      let trend: "increasing" | "stable" | "decreasing" = "stable";
+      if (data.amounts.length >= 2) {
+        const recent = data.amounts.slice(-2);
+        const older = data.amounts.slice(0, -2);
+        if (older.length > 0) {
+          const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
+          const olderAvg = older.reduce((a, b) => a + b, 0) / older.length;
+          if (recentAvg > olderAvg * 1.1) trend = "increasing";
+          else if (recentAvg < olderAvg * 0.9) trend = "decreasing";
+        }
+      }
+
+      return { category, amount: total, frequency, trend };
+    });
+
+    return sources.sort((a, b) => b.amount - a.amount);
+  }, [transactions]);
+
+  // Analyze expense destinations and patterns
+  const expenseAnalysis = useMemo(() => {
+    const expenseTransactions = transactions.filter((t) => t.type === "expense");
+    const totalExpenses = expenseTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
+    
+    // Group by category
+    const byCategory: Record<string, { amounts: number[]; dates: string[] }> = {};
+    expenseTransactions.forEach((t) => {
+      const cat = t.category?.name || "Other";
+      if (!byCategory[cat]) byCategory[cat] = { amounts: [], dates: [] };
+      byCategory[cat].amounts.push(Number(t.amount));
+      byCategory[cat].dates.push(t.transaction_date);
+    });
+
+    const destinations: ExpenseDestination[] = Object.entries(byCategory).map(([category, data]) => {
+      const total = data.amounts.reduce((a, b) => a + b, 0);
+      const percentage = totalExpenses > 0 ? (total / totalExpenses) * 100 : 0;
+      
+      // Detect if recurring (multiple transactions with similar amounts)
+      const avgAmount = total / data.amounts.length;
+      const variance = data.amounts.reduce((sum, a) => sum + Math.abs(a - avgAmount), 0) / data.amounts.length;
+      const isRecurring = data.amounts.length >= 2 && variance < avgAmount * 0.2;
+
+      // Detect trend
+      let trend: "increasing" | "stable" | "decreasing" = "stable";
+      if (data.amounts.length >= 3) {
+        const recent = data.amounts.slice(-2);
+        const older = data.amounts.slice(0, -2);
+        const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
+        const olderAvg = older.reduce((a, b) => a + b, 0) / older.length;
+        if (recentAvg > olderAvg * 1.15) trend = "increasing";
+        else if (recentAvg < olderAvg * 0.85) trend = "decreasing";
+      }
+
+      return { category, amount: total, percentage, trend, isRecurring };
+    });
+
+    return destinations.sort((a, b) => b.amount - a.amount);
+  }, [transactions]);
+
+  // Generate smart insights
+  const cashFlowInsights = useMemo((): CashFlowInsights => {
+    const recurringIncomeTotal = incomeAnalysis
+      .filter((s) => s.frequency === "monthly" || s.frequency === "weekly")
+      .reduce((sum, s) => sum + s.amount, 0);
+    
+    const recurringExpenseTotal = expenseAnalysis
+      .filter((d) => d.isRecurring)
+      .reduce((sum, d) => sum + d.amount, 0);
+
+    const incomePatterns: string[] = [];
+    const expensePatterns: string[] = [];
+    const predictions: string[] = [];
+
+    // Income insights
+    if (incomeAnalysis.length === 0) {
+      incomePatterns.push("No income recorded yet. Add your salary or other income sources.");
+    } else {
+      const monthlyIncome = incomeAnalysis.filter((s) => s.frequency === "monthly");
+      if (monthlyIncome.length > 0) {
+        incomePatterns.push(`${monthlyIncome.length} recurring income source(s) detected`);
+        monthlyIncome.forEach((s) => {
+          if (s.trend === "increasing") {
+            incomePatterns.push(`${s.category} income is growing`);
+          }
+        });
+      }
+      
+      const irregularIncome = incomeAnalysis.filter((s) => s.frequency === "irregular" || s.frequency === "one-time");
+      if (irregularIncome.length > 0) {
+        incomePatterns.push(`${irregularIncome.length} irregular/one-time income source(s)`);
+      }
+    }
+
+    // Expense insights
+    const topExpenses = expenseAnalysis.slice(0, 3);
+    if (topExpenses.length > 0) {
+      expensePatterns.push(`Top spending: ${topExpenses.map((e) => `${e.category} (${e.percentage.toFixed(0)}%)`).join(", ")}`);
+      
+      const increasingExpenses = expenseAnalysis.filter((e) => e.trend === "increasing");
+      if (increasingExpenses.length > 0) {
+        expensePatterns.push(`⚠️ Rising expenses: ${increasingExpenses.map((e) => e.category).join(", ")}`);
+      }
+    }
+
+    // Predictions
+    const netRecurring = recurringIncomeTotal - recurringExpenseTotal;
+    if (recurringIncomeTotal > 0 && recurringExpenseTotal > 0) {
+      if (netRecurring > 0) {
+        predictions.push(`Predictable monthly surplus: ₹${Math.round(netRecurring / 3).toLocaleString()}`);
+      } else {
+        predictions.push(`⚠️ Recurring expenses exceed recurring income by ₹${Math.round(Math.abs(netRecurring / 3)).toLocaleString()}/month`);
+      }
+    }
+
+    const increasingExpenseCategories = expenseAnalysis.filter((e) => e.trend === "increasing");
+    if (increasingExpenseCategories.length > 0) {
+      predictions.push(`${increasingExpenseCategories.length} expense category(s) trending upward - monitor closely`);
+    }
+
+    return {
+      incomeSources: incomeAnalysis,
+      expenseDestinations: expenseAnalysis,
+      recurringIncomeTotal,
+      recurringExpenseTotal,
+      netRecurringFlow: netRecurring,
+      incomePatterns,
+      expensePatterns,
+      predictions,
+    };
+  }, [incomeAnalysis, expenseAnalysis]);
+
+  // Calculate daily averages from historical data (enhanced)
   const dailyAverages = useMemo(() => {
-    if (transactions.length === 0) return { income: 0, expense: 0 };
+    if (transactions.length === 0) return { income: 0, expense: 0, netDaily: 0 };
 
     const last30Days = transactions.filter(
       (t) => new Date(t.transaction_date) >= subDays(now, 30)
@@ -75,6 +262,7 @@ export const usePredictiveAnalytics = () => {
     return {
       income: totalIncome / 30,
       expense: totalExpense / 30,
+      netDaily: (totalIncome - totalExpense) / 30,
     };
   }, [transactions, now]);
 
@@ -353,6 +541,7 @@ export const usePredictiveAnalytics = () => {
   return {
     isLoading,
     cashFlowForecast,
+    cashFlowInsights,
     budgetPredictions,
     anomalies,
     trendData,
