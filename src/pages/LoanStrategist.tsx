@@ -20,6 +20,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { useLoans, CreateLoanInput } from "@/hooks/useLoans";
+import { useTransactions } from "@/hooks/useTransactions";
+import { useWallets } from "@/hooks/useWallets";
+import { useBudgets } from "@/hooks/useBudgets";
 import { useAIChat } from "@/hooks/useAIChat";
 import { Textarea } from "@/components/ui/textarea";
 import ReactMarkdown from "react-markdown";
@@ -60,9 +63,21 @@ const LoanStrategist = () => {
     isCreating,
   } = useLoans();
 
+  const { transactions, totalIncome, totalExpenses } = useTransactions();
+  const { wallets, totalBalance } = useWallets();
+  const { budgets } = useBudgets();
+
   const { messages, isLoading: isAILoading, sendMessage, clearMessages } = useAIChat({
     type: "loan",
-    context: { loans },
+    context: { 
+      loans,
+      transactions: transactions.slice(0, 30),
+      wallets,
+      budgets,
+      totalIncome,
+      totalExpenses,
+      totalBalance,
+    },
   });
 
   const handleCreateLoan = () => {

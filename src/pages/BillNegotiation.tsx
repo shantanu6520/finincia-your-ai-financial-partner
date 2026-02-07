@@ -21,6 +21,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useRecurringBills, CreateBillInput } from "@/hooks/useRecurringBills";
+import { useTransactions } from "@/hooks/useTransactions";
+import { useWallets } from "@/hooks/useWallets";
 import { useAIChat } from "@/hooks/useAIChat";
 import { Textarea } from "@/components/ui/textarea";
 import ReactMarkdown from "react-markdown";
@@ -71,9 +73,18 @@ const BillNegotiation = () => {
     isCreating,
   } = useRecurringBills();
 
+  const { transactions, totalExpenses } = useTransactions();
+  const { wallets, totalBalance } = useWallets();
+
   const { messages, isLoading: isAILoading, sendMessage } = useAIChat({
     type: "bill",
-    context: { bills },
+    context: { 
+      bills,
+      transactions: transactions.slice(0, 30),
+      wallets,
+      totalExpenses,
+      totalBalance,
+    },
   });
 
   const handleCreateBill = () => {
@@ -356,13 +367,15 @@ const BillNegotiation = () => {
           {/* AI Negotiation Panel */}
           <Card className="h-[600px] flex flex-col">
             <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-primary" />
-              AI Recurring Spend Analyst
-              <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-normal">
-                RAG Powered
-              </span>
-            </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  AI Spend Analyst
+                </CardTitle>
+                <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-medium">
+                  RAG Powered
+                </span>
+              </div>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col overflow-hidden p-4 pt-0">
               <div className="flex-1 overflow-y-auto space-y-3 mb-4">

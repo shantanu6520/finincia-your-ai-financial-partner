@@ -20,6 +20,9 @@ interface RequestBody {
     wallets?: unknown[];
     loans?: unknown[];
     bills?: unknown[];
+    totalIncome?: number;
+    totalExpenses?: number;
+    totalBalance?: number;
   };
 }
 
