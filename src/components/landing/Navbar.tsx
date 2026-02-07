@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LayoutDashboard } from "lucide-react";
 import { Link } from "react-router-dom";
 import fininciaLogo from "@/assets/finincia-logo.png";
+import { useAuth } from "@/hooks/useAuth";
 
 const navLinks = [
   { label: "Features", href: "#features" },
@@ -14,6 +15,7 @@ const navLinks = [
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,31 +66,49 @@ const Navbar = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-4 flex-shrink-0">
-            <Link to="/auth">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className={`font-medium tracking-wide transition-all duration-300 ${
-                  isScrolled 
-                    ? 'text-foreground hover:bg-foreground hover:text-background' 
-                    : 'text-primary-foreground hover:bg-primary-foreground hover:text-primary'
-                }`}
-              >
-                Log In
-              </Button>
-            </Link>
-            <Link to="/auth">
-              <Button 
-                size="sm"
-                className={`font-medium tracking-wide ${
-                  isScrolled
-                    ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                    : 'bg-primary-foreground text-primary hover:bg-primary-foreground/90'
-                }`}
-              >
-                Get Started
-              </Button>
-            </Link>
+            {user ? (
+              <Link to="/dashboard">
+                <Button 
+                  size="sm"
+                  className={`font-medium tracking-wide gap-2 ${
+                    isScrolled
+                      ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                      : 'bg-primary-foreground text-primary hover:bg-primary-foreground/90'
+                  }`}
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  Go to Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/auth">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className={`font-medium tracking-wide transition-all duration-300 ${
+                      isScrolled 
+                        ? 'text-foreground hover:bg-foreground hover:text-background' 
+                        : 'text-primary-foreground hover:bg-primary-foreground hover:text-primary'
+                    }`}
+                  >
+                    Log In
+                  </Button>
+                </Link>
+                <Link to="/auth">
+                  <Button 
+                    size="sm"
+                    className={`font-medium tracking-wide ${
+                      isScrolled
+                        ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                        : 'bg-primary-foreground text-primary hover:bg-primary-foreground/90'
+                    }`}
+                  >
+                    Get Started
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -124,16 +144,27 @@ const Navbar = () => {
                 </a>
               ))}
               <div className="flex flex-col gap-3 pt-6 border-t border-border">
-                <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full">
-                    Log In
-                  </Button>
-                </Link>
-                <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button className="w-full bg-primary text-primary-foreground">
-                    Get Started
-                  </Button>
-                </Link>
+                {user ? (
+                  <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button className="w-full bg-primary text-primary-foreground gap-2">
+                      <LayoutDashboard className="w-4 h-4" />
+                      Go to Dashboard
+                    </Button>
+                  </Link>
+                ) : (
+                  <>
+                    <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Button variant="outline" className="w-full">
+                        Log In
+                      </Button>
+                    </Link>
+                    <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Button className="w-full bg-primary text-primary-foreground">
+                        Get Started
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
