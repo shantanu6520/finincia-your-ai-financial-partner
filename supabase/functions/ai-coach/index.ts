@@ -322,8 +322,391 @@ const loanKnowledgeBase: KnowledgeChunk[] = [
   }
 ];
 
-// Semantic similarity keywords for query matching
-const queryCategories: Record<string, string[]> = {
+// ============================================
+// RAG KNOWLEDGE BASE - Financial Coach
+// ============================================
+
+const coachKnowledgeBase: KnowledgeChunk[] = [
+  // Budgeting Strategies
+  {
+    id: "50_30_20_rule",
+    category: "budgeting",
+    keywords: ["50 30 20", "budget rule", "how to budget", "income allocation", "spending plan", "budget method"],
+    title: "The 50/30/20 Budget Rule",
+    content: `The 50/30/20 rule is a simple budgeting framework:
+
+**Allocation:**
+- **50% Needs:** Rent, utilities, groceries, insurance, minimum debt payments
+- **30% Wants:** Entertainment, dining out, subscriptions, hobbies
+- **20% Savings & Debt:** Emergency fund, investments, extra debt payments
+
+**Indian Context:**
+For ₹1L monthly income:
+- ₹50,000 → Needs
+- ₹30,000 → Wants
+- ₹20,000 → Savings/Debt
+
+**Tip:** If you're in debt, consider 50/20/30 (flip wants and savings) to accelerate debt payoff.`
+  },
+  {
+    id: "zero_based_budgeting",
+    category: "budgeting",
+    keywords: ["zero based", "every rupee", "assign money", "envelope", "detailed budget"],
+    title: "Zero-Based Budgeting",
+    content: `Zero-based budgeting assigns every rupee a job:
+
+**How it works:**
+1. Income - Expenses = ₹0 (every rupee is allocated)
+2. Create categories for all spending
+3. Assign amounts before the month begins
+4. Track and adjust as needed
+
+**Best for:** People who want complete control and visibility.
+
+**Example:** ₹80,000 income
+- Rent: ₹25,000
+- Groceries: ₹8,000
+- Transport: ₹5,000
+- EMIs: ₹15,000
+- Utilities: ₹3,000
+- Entertainment: ₹5,000
+- Savings: ₹12,000
+- Misc: ₹7,000
+Total: ₹80,000 (zero remaining)`
+  },
+  {
+    id: "pay_yourself_first",
+    category: "savings",
+    keywords: ["pay yourself first", "automatic savings", "save first", "savings habit", "before spending"],
+    title: "Pay Yourself First Strategy",
+    content: `Save before you spend, not after:
+
+**How it works:**
+1. Set up automatic transfer on salary day
+2. Move savings to a separate account immediately
+3. Live on what remains
+
+**Psychology:** You adapt to spending less because you never "see" the savings.
+
+**Implementation:**
+- Create a separate savings account
+- Set up auto-debit for salary day + 1
+- Start with 10%, increase by 1% every quarter
+
+**Target:** Aim for 20-30% savings rate for financial freedom.
+
+**Tip:** Use SIP (Systematic Investment Plan) for automated investing.`
+  },
+  // Spending Analysis
+  {
+    id: "spending_categories",
+    category: "spending",
+    keywords: ["overspending", "where money goes", "spending analysis", "expense tracking", "spending habits"],
+    title: "Understanding Spending Patterns",
+    content: `Common overspending areas in India:
+
+**Top Money Leaks:**
+1. **Food delivery apps:** Swiggy/Zomato can cost ₹8-15K/month without noticing
+2. **Subscriptions:** Netflix, Prime, Spotify, gym memberships you don't use
+3. **Impulse shopping:** Sale items, online deals, "limited time offers"
+4. **Lifestyle inflation:** Upgrading unnecessarily as income grows
+5. **Social spending:** Treating others, keeping up appearances
+
+**Fix strategies:**
+- Review bank statements monthly
+- Categorize every expense for 3 months
+- Set category limits
+- Use cash for discretionary spending (physical limit)
+
+**Rule of thumb:** If you can't track it, you can't control it.`
+  },
+  {
+    id: "lifestyle_inflation",
+    category: "spending",
+    keywords: ["lifestyle inflation", "lifestyle creep", "spending more", "salary increase", "raise"],
+    title: "Avoiding Lifestyle Inflation",
+    content: `Lifestyle inflation: spending more as you earn more.
+
+**The trap:**
+- ₹50K salary → ₹45K expenses
+- ₹80K salary → ₹75K expenses
+- ₹1.2L salary → ₹1.1L expenses
+
+**The fix - 50% rule for raises:**
+- Get ₹20K raise? Save ₹10K, enjoy ₹10K
+- This builds wealth while rewarding yourself
+
+**Mindset shifts:**
+- "Can I afford this?" → "Is this worth delaying my goals?"
+- "I deserve this" → "Future me deserves security"
+
+**Practical tip:** Automate savings increase whenever salary increases. Never let the extra money hit your spending account.`
+  },
+  // Savings Goals
+  {
+    id: "emergency_fund",
+    category: "savings",
+    keywords: ["emergency fund", "rainy day", "safety net", "unexpected expense", "job loss", "medical emergency"],
+    title: "Building an Emergency Fund",
+    content: `Emergency fund: Your financial safety net.
+
+**How much:**
+- Minimum: 3 months of expenses
+- Recommended: 6 months
+- Ideal: 12 months (for freelancers/business owners)
+
+**For Indian context:**
+Monthly expenses ₹50K → Emergency fund ₹3-6L
+
+**Where to keep:**
+- High-yield savings account (3-4%)
+- Liquid mutual funds (5-7%)
+- NOT in FDs with lock-in periods
+
+**Building it:**
+1. Start with ₹25-50K (1 month)
+2. Add ₹5-10K monthly
+3. Top up with bonuses
+4. Don't touch for non-emergencies
+
+**What counts as emergency:**
+✅ Job loss, medical emergency, urgent home repair
+❌ Sale shopping, vacation, new phone`
+  },
+  {
+    id: "goal_based_savings",
+    category: "savings",
+    keywords: ["savings goal", "save for", "target", "vacation", "car", "house", "wedding", "down payment"],
+    title: "Goal-Based Savings Strategy",
+    content: `Assign savings to specific goals:
+
+**Common goals in India:**
+- Emergency fund: 6 months expenses
+- Home down payment: 20% of property value
+- Children's education: Start early, use equity
+- Retirement: 25-30x annual expenses
+- Car: Avoid loans, save full amount
+- Wedding: 2-3 years advance planning
+
+**How to allocate:**
+1. List all goals with target amounts and timelines
+2. Calculate monthly contribution needed
+3. Prioritize: Emergency > High-interest debt > Goals
+
+**Formula:**
+Monthly savings = Target amount ÷ Months remaining
+
+**Example:** ₹5L car in 2 years
+₹5,00,000 ÷ 24 months = ₹20,833/month
+
+**Tip:** Keep goal money in separate accounts/funds for clarity.`
+  },
+  // Income & Expenses
+  {
+    id: "income_diversification",
+    category: "income",
+    keywords: ["multiple income", "side hustle", "passive income", "extra money", "income sources", "freelance"],
+    title: "Income Diversification Strategies",
+    content: `Multiple income streams = Financial security.
+
+**Types of income:**
+1. **Active:** Salary, freelancing, consulting
+2. **Passive:** Rent, dividends, royalties
+3. **Portfolio:** Capital gains, interest
+
+**Side hustle ideas for Indians:**
+- Freelancing (writing, design, coding)
+- Online tutoring
+- Content creation
+- Consulting in your expertise
+- Selling products online
+
+**Building passive income:**
+- Rental property
+- Dividend stocks
+- REITs
+- Digital products
+- Systematic withdrawal from investments
+
+**Rule:** Dedicate side income to savings/investments, not lifestyle.`
+  },
+  {
+    id: "expense_reduction",
+    category: "spending",
+    keywords: ["reduce expenses", "cut costs", "save money", "lower bills", "cheaper alternatives"],
+    title: "Practical Expense Reduction Tips",
+    content: `Cut expenses without sacrificing quality of life:
+
+**High impact cuts:**
+1. **Housing:** Negotiate rent, consider roommate, move to cheaper area
+2. **Food:** Cook more, meal prep, reduce delivery
+3. **Transport:** Carpool, public transport, maintain vehicle properly
+4. **Subscriptions:** Audit and cancel unused ones
+5. **Insurance:** Compare and switch providers
+
+**Quick wins:**
+- Review and negotiate phone/internet plans
+- Use cashback and rewards strategically
+- Buy generic brands
+- Wait 24-48 hours before non-essential purchases
+- Use price comparison tools
+
+**Monthly potential savings:**
+- Cook 50% more: ₹5-8K
+- Cancel unused subscriptions: ₹1-3K
+- Switch plans: ₹500-2K
+- Reduce delivery: ₹3-5K
+
+**Total potential:** ₹10-18K/month without major lifestyle changes`
+  },
+  // Financial Health
+  {
+    id: "financial_health_score",
+    category: "health",
+    keywords: ["financial health", "score", "where do I stand", "am I doing well", "assessment", "checkup"],
+    title: "Assessing Your Financial Health",
+    content: `Key metrics for financial health:
+
+**1. Savings Rate:**
+- Poor: <10%
+- Average: 10-20%
+- Good: 20-30%
+- Excellent: >30%
+
+**2. Debt-to-Income Ratio:**
+- Healthy: <30% of income goes to debt
+- Warning: 30-40%
+- Danger: >40%
+
+**3. Emergency Fund:**
+- Poor: <1 month
+- Average: 1-3 months
+- Good: 3-6 months
+- Excellent: >6 months
+
+**4. Net Worth Growth:**
+- Should increase year over year
+- Track assets minus liabilities
+
+**Quick health check:**
+✅ Spending < Income (surplus)
+✅ Emergency fund exists
+✅ No credit card debt
+✅ Retirement savings started
+✅ Insurance coverage adequate
+
+**Score yourself:** 1 point each, 5/5 = Excellent`
+  },
+  {
+    id: "financial_mistakes",
+    category: "health",
+    keywords: ["mistake", "wrong", "avoid", "don't do", "common errors", "bad habits"],
+    title: "Common Financial Mistakes to Avoid",
+    content: `Top financial mistakes and how to avoid them:
+
+**1. No emergency fund**
+Fix: Build 3-6 months expenses before investing
+
+**2. Lifestyle inflation**
+Fix: Save 50% of every raise
+
+**3. Ignoring insurance**
+Fix: Get term life (10x income) and health insurance
+
+**4. Not tracking expenses**
+Fix: Use an app, review monthly
+
+**5. Delaying retirement savings**
+Fix: Start NOW, even ₹5,000/month grows significantly
+
+**6. Emotional spending**
+Fix: 48-hour rule for non-essentials
+
+**7. No financial goals**
+Fix: Write specific goals with amounts and dates
+
+**8. Comparing with others**
+Fix: Your journey is unique, focus on your progress
+
+**9. Not reviewing finances**
+Fix: Monthly 30-minute money date
+
+**10. Avoiding difficult conversations**
+Fix: Discuss money with spouse/family regularly`
+  },
+  // Specific Topics
+  {
+    id: "tax_saving",
+    category: "tax",
+    keywords: ["tax", "save tax", "80C", "deduction", "tax planning", "income tax"],
+    title: "Tax Saving Strategies for India",
+    content: `Maximize tax savings legally:
+
+**Section 80C (₹1.5L limit):**
+- ELSS mutual funds (3-year lock-in, market returns)
+- PPF (15-year, safe, tax-free returns)
+- EPF contribution
+- Life insurance premium
+- ULIP
+- NSC
+- Home loan principal
+
+**Section 80D (Health Insurance):**
+- Self: ₹25,000
+- Parents (senior): ₹50,000
+- Total: ₹75,000-1L
+
+**Section 24 (Home Loan Interest):**
+- Up to ₹2L for self-occupied property
+
+**Other deductions:**
+- NPS: Additional ₹50,000 (80CCD)
+- Education loan interest: No limit (80E)
+- Donations: 50-100% (80G)
+
+**Priority order:**
+1. EPF (automatic, employer match)
+2. Health insurance (essential coverage)
+3. ELSS (tax saving + wealth creation)
+4. NPS (if tax bracket is high)`
+  },
+  {
+    id: "credit_score",
+    category: "credit",
+    keywords: ["credit score", "CIBIL", "credit report", "improve score", "bad credit", "loan rejection"],
+    title: "Understanding and Improving Credit Score",
+    content: `Credit score impacts your borrowing ability:
+
+**Score ranges:**
+- 750+: Excellent (best rates)
+- 700-749: Good
+- 650-699: Fair
+- Below 650: Poor
+
+**Factors affecting score:**
+1. Payment history (35%): Pay on time, always
+2. Credit utilization (30%): Keep under 30%
+3. Credit age (15%): Don't close old cards
+4. Credit mix (10%): Variety helps
+5. New credit (10%): Avoid multiple applications
+
+**Improve your score:**
+- Set payment reminders/auto-pay
+- Pay full credit card balance monthly
+- Keep utilization under 30%
+- Don't apply for multiple loans together
+- Check report for errors annually
+
+**How to check:**
+- CIBIL: ₹550/year for detailed report
+- Free: One report per year from each bureau
+
+**Timeline:** Improvements show in 3-6 months`
+  }
+];
+
+// Semantic similarity keywords for query matching - Loans
+const loanQueryCategories: Record<string, string[]> = {
   loan_strategy: ["strategy", "method", "approach", "how to pay", "which loan first", "prioritize", "order"],
   debt_management: ["manage", "handle", "control", "reduce", "eliminate", "get out of", "freedom"],
   interest_optimization: ["interest", "rate", "reduce rate", "lower interest", "save interest", "refinance", "transfer"],
@@ -332,11 +715,22 @@ const queryCategories: Record<string, string[]> = {
   negotiation: ["negotiate", "talk to bank", "reduce", "settlement", "ask for", "call bank", "lower"]
 };
 
+// Semantic similarity keywords for query matching - Coach
+const coachQueryCategories: Record<string, string[]> = {
+  budgeting: ["budget", "50 30 20", "allocate", "plan", "monthly", "income", "spending plan", "zero based"],
+  savings: ["save", "savings", "emergency fund", "goal", "put aside", "accumulate", "rainy day"],
+  spending: ["spend", "spending", "overspend", "expense", "where money goes", "lifestyle", "cut cost", "reduce"],
+  income: ["income", "earn", "side hustle", "passive", "multiple", "extra money", "freelance"],
+  health: ["financial health", "score", "doing well", "assessment", "check", "status", "how am i"],
+  tax: ["tax", "save tax", "80c", "deduction", "income tax"],
+  credit: ["credit", "cibil", "score", "report", "improve"]
+};
+
 // ============================================
 // RAG RETRIEVAL FUNCTIONS
 // ============================================
 
-function retrieveRelevantKnowledge(
+function retrieveRelevantLoanKnowledge(
   query: string,
   userLoans: unknown[],
   topK: number = 4
@@ -355,7 +749,7 @@ function retrieveRelevantKnowledge(
     }
 
     // Category matching based on query intent
-    for (const [category, categoryKeywords] of Object.entries(queryCategories)) {
+    for (const [category, categoryKeywords] of Object.entries(loanQueryCategories)) {
       if (chunk.category === category) {
         for (const kw of categoryKeywords) {
           if (queryLower.includes(kw)) {
@@ -383,6 +777,69 @@ function retrieveRelevantKnowledge(
         if (loan.interest_rate && loan.interest_rate > 18 && chunk.id.includes("credit_card")) {
           score += 7;
         }
+      }
+    }
+
+    if (score > 0) {
+      scoredChunks.push({ ...chunk, relevanceScore: score });
+    }
+  }
+
+  // Sort by score and return top K
+  scoredChunks.sort((a, b) => (b.relevanceScore || 0) - (a.relevanceScore || 0));
+  return scoredChunks.slice(0, topK);
+}
+
+function retrieveRelevantCoachKnowledge(
+  query: string,
+  context: RequestBody["context"],
+  topK: number = 4
+): KnowledgeChunk[] {
+  const queryLower = query.toLowerCase();
+  const scoredChunks: KnowledgeChunk[] = [];
+
+  for (const chunk of coachKnowledgeBase) {
+    let score = 0;
+
+    // Keyword matching
+    for (const keyword of chunk.keywords) {
+      if (queryLower.includes(keyword.toLowerCase())) {
+        score += 10;
+      }
+    }
+
+    // Category matching based on query intent
+    for (const [category, categoryKeywords] of Object.entries(coachQueryCategories)) {
+      if (chunk.category === category) {
+        for (const kw of categoryKeywords) {
+          if (queryLower.includes(kw)) {
+            score += 5;
+          }
+        }
+      }
+    }
+
+    // Title partial matching
+    const titleWords = chunk.title.toLowerCase().split(" ");
+    for (const word of titleWords) {
+      if (queryLower.includes(word) && word.length > 3) {
+        score += 3;
+      }
+    }
+
+    // Context-aware boosting
+    if (context) {
+      // Boost budget content if user has budgets
+      if (context.budgets && Array.isArray(context.budgets) && context.budgets.length > 0) {
+        if (chunk.category === "budgeting") score += 5;
+      }
+      // Boost savings content if user has goals
+      if (context.goals && Array.isArray(context.goals) && context.goals.length > 0) {
+        if (chunk.category === "savings") score += 5;
+      }
+      // Boost spending content if user has transactions
+      if (context.transactions && Array.isArray(context.transactions) && context.transactions.length > 10) {
+        if (chunk.category === "spending") score += 5;
       }
     }
 
@@ -442,6 +899,53 @@ function analyzeLoanPortfolio(loans: unknown[]): string {
   return analysis;
 }
 
+function analyzeFinancialOverview(context: RequestBody["context"]): string {
+  if (!context) return "No financial data available.";
+
+  let analysis = `**Financial Overview:**\n`;
+
+  // Wallet analysis
+  if (context.wallets && Array.isArray(context.wallets)) {
+    const typedWallets = context.wallets as Array<{ balance: number; name: string; type: string }>;
+    const totalBalance = typedWallets.reduce((sum, w) => sum + (w.balance || 0), 0);
+    analysis += `💰 Total Balance: ₹${totalBalance.toLocaleString("en-IN")} across ${typedWallets.length} wallets\n`;
+  }
+
+  // Transaction analysis
+  if (context.transactions && Array.isArray(context.transactions) && context.transactions.length > 0) {
+    const typedTx = context.transactions as Array<{ type: string; amount: number }>;
+    const income = typedTx.filter(t => t.type === "income").reduce((sum, t) => sum + (t.amount || 0), 0);
+    const expenses = typedTx.filter(t => t.type === "expense").reduce((sum, t) => sum + (t.amount || 0), 0);
+    const savingsRate = income > 0 ? ((income - expenses) / income * 100).toFixed(1) : 0;
+    
+    analysis += `📊 Recent Period: Income ₹${income.toLocaleString("en-IN")} | Expenses ₹${expenses.toLocaleString("en-IN")}\n`;
+    analysis += `📈 Savings Rate: ${savingsRate}%\n`;
+    
+    if (Number(savingsRate) < 10) {
+      analysis += `⚠️ LOW SAVINGS: Your savings rate is below 10%. Target at least 20%.\n`;
+    } else if (Number(savingsRate) >= 30) {
+      analysis += `✅ EXCELLENT: Your savings rate is above 30%. Great job!\n`;
+    }
+  }
+
+  // Budget analysis
+  if (context.budgets && Array.isArray(context.budgets) && context.budgets.length > 0) {
+    analysis += `📋 Active Budgets: ${context.budgets.length} categories tracked\n`;
+  }
+
+  // Goal analysis
+  if (context.goals && Array.isArray(context.goals) && context.goals.length > 0) {
+    const typedGoals = context.goals as Array<{ status: string; current_amount: number; target_amount: number }>;
+    const activeGoals = typedGoals.filter(g => g.status === "active");
+    const totalProgress = activeGoals.length > 0
+      ? (activeGoals.reduce((sum, g) => sum + (g.current_amount / g.target_amount), 0) / activeGoals.length * 100).toFixed(0)
+      : 0;
+    analysis += `🎯 Goals: ${activeGoals.length} active, ${totalProgress}% average progress\n`;
+  }
+
+  return analysis;
+}
+
 // ============================================
 // SYSTEM PROMPT BUILDER WITH RAG
 // ============================================
@@ -463,7 +967,7 @@ ${context.bills ? `- Recurring Bills: ${JSON.stringify(context.bills)}` : ""}`
     case "loan": {
       // RAG: Retrieve relevant knowledge based on user query
       const relevantKnowledge = userQuery 
-        ? retrieveRelevantKnowledge(userQuery, context?.loans || [])
+        ? retrieveRelevantLoanKnowledge(userQuery, context?.loans || [])
         : [];
       
       // RAG: Analyze user's loan portfolio
@@ -511,17 +1015,41 @@ You are the Bill Negotiation Assistant feature of FININCIA. Your role is to:
 
 Provide specific, actionable scripts and templates. Be persuasive but professional.${contextSummary}`;
 
-    default:
+    default: {
+      // RAG: Retrieve relevant financial knowledge based on user query
+      const relevantKnowledge = userQuery 
+        ? retrieveRelevantCoachKnowledge(userQuery, context)
+        : [];
+      
+      // RAG: Analyze user's financial overview
+      const financialOverview = analyzeFinancialOverview(context);
+
+      const ragContext = relevantKnowledge.length > 0
+        ? `\n\n=== RETRIEVED KNOWLEDGE (RAG) ===
+Use this curated financial knowledge to provide accurate, expert advice:
+
+${relevantKnowledge.map((k, i) => `[${i + 1}] ${k.title}:\n${k.content}`).join("\n\n")}
+=== END RETRIEVED KNOWLEDGE ===`
+        : "";
+
+      const overviewContext = financialOverview
+        ? `\n\n=== USER FINANCIAL OVERVIEW ===\n${financialOverview}\n=== END FINANCIAL OVERVIEW ===`
+        : "";
+
       return `${basePrompt}
 
-You are the AI Financial Coach feature of FININCIA. Your role is to:
+You are the AI Financial Coach feature of FININCIA, powered by RAG (Retrieval-Augmented Generation).
+
+Your role is to:
 1. Help users understand their spending patterns
-2. Identify opportunities to save money
-3. Explain budget overruns and suggest fixes
+2. Identify opportunities to save money using the RETRIEVED KNOWLEDGE
+3. Explain budget overruns and suggest fixes based on proven strategies
 4. Provide personalized financial advice based on their data
 5. Answer questions about personal finance in India
 
-Be conversational and supportive. Use the user's actual financial data to provide relevant insights.${contextSummary}`;
+IMPORTANT: Base your advice on the retrieved knowledge chunks. Reference specific strategies from the knowledge base (like 50/30/20 rule, pay yourself first, etc.) when applicable. Use the user's actual financial data to make recommendations specific and actionable.
+${ragContext}${overviewContext}${contextSummary}`;
+    }
   }
 };
 
@@ -545,13 +1073,22 @@ serve(async (req) => {
     const userQuery = latestUserMessage?.content || "";
 
     // Log RAG retrieval for debugging
-    if (type === "loan" && userQuery) {
-      const retrievedKnowledge = retrieveRelevantKnowledge(userQuery, context?.loans || []);
-      console.log(`[RAG] Query: "${userQuery.substring(0, 50)}..."`);
-      console.log(`[RAG] Retrieved ${retrievedKnowledge.length} knowledge chunks:`);
-      retrievedKnowledge.forEach((k, i) => {
-        console.log(`  ${i + 1}. ${k.title} (score: ${k.relevanceScore})`);
-      });
+    if (userQuery) {
+      if (type === "loan") {
+        const retrievedKnowledge = retrieveRelevantLoanKnowledge(userQuery, context?.loans || []);
+        console.log(`[RAG-Loan] Query: "${userQuery.substring(0, 50)}..."`);
+        console.log(`[RAG-Loan] Retrieved ${retrievedKnowledge.length} knowledge chunks:`);
+        retrievedKnowledge.forEach((k, i) => {
+          console.log(`  ${i + 1}. ${k.title} (score: ${k.relevanceScore})`);
+        });
+      } else if (type === "coach" || !type) {
+        const retrievedKnowledge = retrieveRelevantCoachKnowledge(userQuery, context);
+        console.log(`[RAG-Coach] Query: "${userQuery.substring(0, 50)}..."`);
+        console.log(`[RAG-Coach] Retrieved ${retrievedKnowledge.length} knowledge chunks:`);
+        retrievedKnowledge.forEach((k, i) => {
+          console.log(`  ${i + 1}. ${k.title} (score: ${k.relevanceScore})`);
+        });
+      }
     }
 
     // Pass user query for RAG-enhanced prompt generation

@@ -14,9 +14,9 @@ import ReactMarkdown from "react-markdown";
 
 const suggestedQuestions = [
   "Where am I overspending this month?",
-  "How can I save more money?",
+  "How should I budget using 50/30/20 rule?",
+  "Help me build an emergency fund",
   "What's my financial health score?",
-  "Help me create a savings plan",
 ];
 
 const AICoach = () => {
@@ -68,9 +68,12 @@ const AICoach = () => {
                 <Sparkles className="w-6 h-6 text-primary" />
               </div>
               AI Financial Coach
+              <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-normal">
+                RAG Powered
+              </span>
             </h1>
             <p className="text-muted-foreground mt-1">
-              Your personal CFO powered by AI
+              Your personal CFO powered by AI with curated financial knowledge
             </p>
           </div>
           {messages.length > 0 && (
