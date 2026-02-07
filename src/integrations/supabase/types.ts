@@ -214,36 +214,54 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          budget_alert_threshold: number | null
           created_at: string
           currency: string
+          email_reports_enabled: boolean | null
           financial_year_start: number | null
+          goal_reminder_enabled: boolean | null
           id: string
           name: string | null
+          notification_frequency: string | null
           region: string | null
           updated_at: string
           user_id: string
+          whatsapp_enabled: boolean | null
+          whatsapp_number: string | null
         }
         Insert: {
           avatar_url?: string | null
+          budget_alert_threshold?: number | null
           created_at?: string
           currency?: string
+          email_reports_enabled?: boolean | null
           financial_year_start?: number | null
+          goal_reminder_enabled?: boolean | null
           id?: string
           name?: string | null
+          notification_frequency?: string | null
           region?: string | null
           updated_at?: string
           user_id: string
+          whatsapp_enabled?: boolean | null
+          whatsapp_number?: string | null
         }
         Update: {
           avatar_url?: string | null
+          budget_alert_threshold?: number | null
           created_at?: string
           currency?: string
+          email_reports_enabled?: boolean | null
           financial_year_start?: number | null
+          goal_reminder_enabled?: boolean | null
           id?: string
           name?: string | null
+          notification_frequency?: string | null
           region?: string | null
           updated_at?: string
           user_id?: string
+          whatsapp_enabled?: boolean | null
+          whatsapp_number?: string | null
         }
         Relationships: []
       }
