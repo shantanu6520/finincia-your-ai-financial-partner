@@ -153,11 +153,25 @@ export const useRecurringBills = () => {
       console.error("Mark negotiated error:", error);
     },
   });
+  // Get monthly equivalent of a bill
+  const getMonthlyEquivalent = (bill: RecurringBill): number => {
+    const amount = Number(bill.amount);
+    switch (bill.frequency) {
+      case "weekly":
+        return amount * 4.33; // Average weeks per month
+      case "monthly":
+        return amount;
+      case "quarterly":
+        return amount / 3;
+      case "yearly":
+        return amount / 12;
+      default:
+        return amount;
+    }
+  };
 
-  // Calculate totals
-  const totalMonthlyBills = bills
-    .filter((b) => b.frequency === "monthly")
-    .reduce((sum, b) => sum + Number(b.amount), 0);
+  // Calculate totals - convert ALL bills to monthly equivalents
+  const totalMonthlyBills = bills.reduce((sum, b) => sum + getMonthlyEquivalent(b), 0);
 
   const totalSavingsAchieved = bills.reduce((sum, b) => sum + Number(b.savings_achieved), 0);
 
