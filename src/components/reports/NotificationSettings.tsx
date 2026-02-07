@@ -1,27 +1,19 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { MessageSquare, Bell, Calendar, Save, Loader2, Smartphone, Mail, Clock } from "lucide-react";
+import { Bell, Save, Loader2, Mail, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
 
 interface NotificationSettingsProps {
   profile: {
-    whatsapp_number?: string | null;
-    whatsapp_enabled?: boolean | null;
     email_reports_enabled?: boolean | null;
     notification_frequency?: string | null;
     budget_alert_threshold?: number | null;
     goal_reminder_enabled?: boolean | null;
   } | null;
   onSave: (settings: Partial<{
-    whatsapp_number: string;
-    whatsapp_enabled: boolean;
     email_reports_enabled: boolean;
     notification_frequency: string;
     budget_alert_threshold: number;
@@ -32,8 +24,6 @@ interface NotificationSettingsProps {
 
 const NotificationSettings = ({ profile, onSave, isUpdating }: NotificationSettingsProps) => {
   const [settings, setSettings] = useState({
-    whatsapp_number: profile?.whatsapp_number || "",
-    whatsapp_enabled: profile?.whatsapp_enabled || false,
     email_reports_enabled: profile?.email_reports_enabled ?? true,
     notification_frequency: profile?.notification_frequency || "weekly",
     budget_alert_threshold: profile?.budget_alert_threshold || 80,
@@ -41,103 +31,17 @@ const NotificationSettings = ({ profile, onSave, isUpdating }: NotificationSetti
   });
 
   const handleSave = () => {
-    if (settings.whatsapp_enabled && !settings.whatsapp_number) {
-      toast.error("Please enter your WhatsApp number");
-      return;
-    }
     onSave(settings);
   };
 
   return (
     <div className="space-y-6">
-      {/* WhatsApp Settings */}
-      <Card className="border-border/50">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-green-500/10 rounded-lg">
-              <MessageSquare className="w-5 h-5 text-green-500" />
-            </div>
-            <div>
-              <CardTitle className="text-lg">WhatsApp AI Coach</CardTitle>
-              <CardDescription>Get financial insights via WhatsApp</CardDescription>
-            </div>
-            <span className="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full ml-auto">PRO</span>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label className="text-base">Enable WhatsApp Coach</Label>
-              <p className="text-sm text-muted-foreground">
-                Receive summaries, alerts, and chat with your AI coach
-              </p>
-            </div>
-            <Switch
-              checked={settings.whatsapp_enabled}
-              onCheckedChange={(checked) => setSettings({ ...settings, whatsapp_enabled: checked })}
-            />
-          </div>
-
-          {settings.whatsapp_enabled && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              className="space-y-4"
-            >
-              <Separator />
-              <div className="space-y-2">
-                <Label htmlFor="whatsapp">WhatsApp Number</Label>
-                <div className="flex gap-2">
-                  <div className="flex items-center px-3 bg-secondary rounded-l-md border border-r-0 border-input">
-                    <Smartphone className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                  <Input
-                    id="whatsapp"
-                    placeholder="+91 98765 43210"
-                    value={settings.whatsapp_number}
-                    onChange={(e) => setSettings({ ...settings, whatsapp_number: e.target.value })}
-                    className="rounded-l-none"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Include country code. We'll send a verification message.
-                </p>
-              </div>
-
-              <div className="bg-muted/50 rounded-lg p-4 space-y-3">
-                <h4 className="font-medium text-sm">What you'll receive:</h4>
-                <ul className="text-sm text-muted-foreground space-y-2">
-                  <li className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Daily/weekly financial summaries
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Bell className="w-4 h-4" />
-                    Budget breach alerts
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4" />
-                    Chat with AI for financial queries
-                  </li>
-                </ul>
-              </div>
-
-              <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
-                <p className="text-sm text-amber-600 dark:text-amber-400">
-                  <strong>Coming Soon:</strong> WhatsApp integration is being configured. Your preferences will be saved and you'll be notified when the service is ready.
-                </p>
-              </div>
-            </motion.div>
-          )}
-        </CardContent>
-      </Card>
-
       {/* Email Reports */}
       <Card className="border-border/50">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <Mail className="w-5 h-5 text-blue-500" />
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Mail className="w-5 h-5 text-primary" />
             </div>
             <div>
               <CardTitle className="text-lg">Email Reports</CardTitle>
@@ -165,8 +69,8 @@ const NotificationSettings = ({ profile, onSave, isUpdating }: NotificationSetti
       <Card className="border-border/50">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-orange-500/10 rounded-lg">
-              <Bell className="w-5 h-5 text-orange-500" />
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Bell className="w-5 h-5 text-primary" />
             </div>
             <div>
               <CardTitle className="text-lg">Alert Preferences</CardTitle>
