@@ -1,11 +1,12 @@
 import { Mail, Twitter, Linkedin, Instagram } from "lucide-react";
+import { Link } from "react-router-dom";
 import fininciaLogo from "@/assets/finincia-logo.png";
 
 const footerLinks = {
   product: [
     { label: "Features", href: "#features" },
     { label: "Pricing", href: "#pricing" },
-    { label: "Security", href: "#" },
+    { label: "Security", href: "/security", isRoute: true },
     { label: "Roadmap", href: "#" },
   ],
   company: [
@@ -66,12 +67,21 @@ const Footer = () => {
             <ul className="space-y-4">
               {footerLinks.product.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
-                  >
-                    {link.label}
-                  </a>
+                  {'isRoute' in link && link.isRoute ? (
+                    <Link
+                      to={link.href}
+                      className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a
+                      href={link.href}
+                      className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
