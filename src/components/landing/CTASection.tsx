@@ -30,13 +30,6 @@ const CTASection = () => {
               Start Your Free Trial
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button 
-              size="xl"
-              variant="outline"
-              className="border-border text-foreground hover:bg-secondary px-8"
-            >
-              Schedule a Demo
-            </Button>
           </div>
 
           <div className="flex flex-wrap justify-center gap-8 text-muted-foreground">
