@@ -1,1 +1,10 @@
 project_id = "nauxqawrexowecdzlvuw"
+
+[functions.ai-coach]
+verify_jwt = false
+
+[functions.razorpay-subscription]
+verify_jwt = false
+
+[functions.razorpay-webhook]
+verify_jwt = false

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Check, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const features = [
   "Unlimited AI-powered insights",
@@ -130,10 +131,12 @@ const PricingSection = () => {
                   ))}
                 </ul>
                 
-                <Button size="xl" className="w-full group bg-primary text-primary-foreground hover:bg-primary/90">
-                  Get Started
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
+                <Link to="/auth">
+                  <Button size="xl" className="w-full group bg-primary text-primary-foreground hover:bg-primary/90">
+                    Get Started
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
                 
                 <p className="text-center text-sm text-muted-foreground mt-4">
                   Start managing your finances smarter today.

@@ -19,6 +19,7 @@ import BillNegotiation from "./pages/BillNegotiation";
 import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
 import Security from "./pages/Security";
+import Subscription from "./pages/Subscription";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "@/components/dashboard/ProtectedRoute";
 
@@ -121,6 +122,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Reports />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/subscription"
+              element={
+                <ProtectedRoute>
+                  <Subscription />
                 </ProtectedRoute>
               }
             />
