@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, Clock, CreditCard } from "lucide-react";
+import { ArrowRight, Shield, CreditCard } from "lucide-react";
 
 const CTASection = () => {
   return (
@@ -27,23 +27,19 @@ const CTASection = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button size="xl" className="group bg-primary text-primary-foreground hover:bg-primary/90 px-8">
-              Start Your Free Trial
+              Get Started Now
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
 
           <div className="flex flex-wrap justify-center gap-8 text-muted-foreground">
             <div className="flex items-center gap-2">
-              <CreditCard className="w-5 h-5" />
-              <span className="text-sm">No credit card required</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5" />
-              <span className="text-sm">14-day free trial</span>
-            </div>
-            <div className="flex items-center gap-2">
               <Shield className="w-5 h-5" />
-              <span className="text-sm">Cancel anytime</span>
+              <span className="text-sm">Bank-grade security</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CreditCard className="w-5 h-5" />
+              <span className="text-sm">Affordable pricing</span>
             </div>
           </div>
         </motion.div>

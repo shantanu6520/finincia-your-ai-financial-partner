@@ -131,12 +131,12 @@ const PricingSection = () => {
                 </ul>
                 
                 <Button size="xl" className="w-full group bg-primary text-primary-foreground hover:bg-primary/90">
-                  Start 14-Day Free Trial
+                  Get Started
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
                 
                 <p className="text-center text-sm text-muted-foreground mt-4">
-                  No credit card required. Full access for 14 days.
+                  Start managing your finances smarter today.
                 </p>
               </div>
             </div>

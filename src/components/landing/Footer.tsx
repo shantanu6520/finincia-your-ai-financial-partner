@@ -1,4 +1,4 @@
-import { Mail, Twitter, Linkedin, Instagram } from "lucide-react";
+import { Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
 import fininciaLogo from "@/assets/finincia-logo.png";
 
@@ -7,7 +7,6 @@ const footerLinks = {
     { label: "Features", href: "#features" },
     { label: "Pricing", href: "#pricing" },
     { label: "Security", href: "/security", isRoute: true },
-    { label: "Roadmap", href: "#" },
   ],
   company: [
     { label: "About", href: "#" },
@@ -23,10 +22,7 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { icon: Twitter, href: "#", label: "Twitter" },
-  { icon: Linkedin, href: "#", label: "LinkedIn" },
   { icon: Instagram, href: "#", label: "Instagram" },
-  { icon: Mail, href: "#", label: "Email" },
 ];
 
 const Footer = () => {
