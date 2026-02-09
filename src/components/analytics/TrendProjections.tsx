@@ -124,7 +124,7 @@ const TrendProjections = ({ data, currencySymbol, formatAmount }: TrendProjectio
                   strokeWidth={2}
                   strokeDasharray="8 4"
                   dot={false}
-                  connectNulls={false}
+                  connectNulls={true}
                   name="forecast"
                 />
               )}

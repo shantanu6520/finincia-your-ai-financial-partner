@@ -726,7 +726,7 @@ export const usePredictiveAnalytics = () => {
       data.push({
         date: format(date, "dd MMM"),
         actual: actualBalance,
-        predicted: actualBalance,
+        predicted: i === 0 ? actualBalance : undefined, // Set predicted on last historical point to connect lines
         confidenceLow: actualBalance * 0.98,
         confidenceHigh: actualBalance * 1.02,
         isForecasted: false,
@@ -1053,6 +1053,7 @@ export const usePredictiveAnalytics = () => {
       data.push({
         date: format(date, "dd MMM"),
         actual: dayExpense,
+        forecast: i === 0 ? dayExpense : undefined, // Set forecast on last actual point to connect lines
       });
     }
 

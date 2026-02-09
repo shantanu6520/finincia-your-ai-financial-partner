@@ -131,15 +131,17 @@ const CashFlowForecast = ({
             fillOpacity={1}
             connectNulls={false}
           />
-          {/* Forecast line */}
+          {/* Forecast line - only show on forecasted data points */}
           <Area
             type="monotone"
-            dataKey="predicted"
+            dataKey={(d: CashFlowData) => d.isForecasted ? d.predicted : undefined}
             stroke="hsl(var(--primary))"
             strokeWidth={2}
             strokeDasharray="5 5"
             fill="url(#forecastGradient)"
             fillOpacity={1}
+            connectNulls={true}
+            name="predicted"
           />
           <ReferenceLine 
             x={chartData.find(d => d.isForecasted)?.date} 
