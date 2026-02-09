@@ -10,6 +10,7 @@ interface ProProtectedRouteProps {
 // Whitelist of allowed email addresses
 const ALLOWED_EMAILS = [
   "dhengre.shantanu2000@gmail.com",
+  "test@razorpay.com",
 ];
 
 const ProProtectedRoute = ({ children }: ProProtectedRouteProps) => {
