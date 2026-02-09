@@ -53,7 +53,8 @@ const Auth = () => {
 
   useEffect(() => {
     if (user) {
-      navigate("/dashboard");
+      // After login, redirect to subscription page (they'll be redirected to dashboard if Pro)
+      navigate("/subscription");
     }
   }, [user, navigate]);
 
@@ -86,7 +87,7 @@ const Auth = () => {
     }
 
     toast.success("Welcome back!");
-    navigate("/dashboard");
+    navigate("/subscription");
   };
 
   const handleSignup = async (data: SignupFormData) => {

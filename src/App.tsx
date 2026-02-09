@@ -22,6 +22,7 @@ import Security from "./pages/Security";
 import Subscription from "./pages/Subscription";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "@/components/dashboard/ProtectedRoute";
+import ProProtectedRoute from "@/components/dashboard/ProProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -40,89 +41,89 @@ const App = () => (
             <Route
               path="/dashboard"
               element={
-                <ProtectedRoute>
+                <ProProtectedRoute>
                   <Dashboard />
-                </ProtectedRoute>
+                </ProProtectedRoute>
               }
             />
             <Route
               path="/wallets"
               element={
-                <ProtectedRoute>
+                <ProProtectedRoute>
                   <Wallets />
-                </ProtectedRoute>
+                </ProProtectedRoute>
               }
             />
             <Route
               path="/transactions"
               element={
-                <ProtectedRoute>
+                <ProProtectedRoute>
                   <Transactions />
-                </ProtectedRoute>
+                </ProProtectedRoute>
               }
             />
             <Route
               path="/budgets"
               element={
-                <ProtectedRoute>
+                <ProProtectedRoute>
                   <Budgets />
-                </ProtectedRoute>
+                </ProProtectedRoute>
               }
             />
             <Route
               path="/goals"
               element={
-                <ProtectedRoute>
+                <ProProtectedRoute>
                   <Goals />
-                </ProtectedRoute>
+                </ProProtectedRoute>
               }
             />
             <Route
               path="/profile"
               element={
-                <ProtectedRoute>
+                <ProProtectedRoute>
                   <Profile />
-                </ProtectedRoute>
+                </ProProtectedRoute>
               }
             />
             <Route
               path="/ai-coach"
               element={
-                <ProtectedRoute>
+                <ProProtectedRoute>
                   <AICoach />
-                </ProtectedRoute>
+                </ProProtectedRoute>
               }
             />
             <Route
               path="/loan-strategist"
               element={
-                <ProtectedRoute>
+                <ProProtectedRoute>
                   <LoanStrategist />
-                </ProtectedRoute>
+                </ProProtectedRoute>
               }
             />
             <Route
               path="/bill-negotiation"
               element={
-                <ProtectedRoute>
+                <ProProtectedRoute>
                   <BillNegotiation />
-                </ProtectedRoute>
+                </ProProtectedRoute>
               }
             />
             <Route
               path="/analytics"
               element={
-                <ProtectedRoute>
+                <ProProtectedRoute>
                   <Analytics />
-                </ProtectedRoute>
+                </ProProtectedRoute>
               }
             />
             <Route
               path="/reports"
               element={
-                <ProtectedRoute>
+                <ProProtectedRoute>
                   <Reports />
-                </ProtectedRoute>
+                </ProProtectedRoute>
               }
             />
             <Route
