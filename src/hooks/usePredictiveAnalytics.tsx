@@ -1088,9 +1088,12 @@ export const usePredictiveAnalytics = () => {
     const highRiskBudgets = budgetPredictions.filter((b) => b.riskLevel === "high").length;
     const alertAnomalies = anomalies.filter((a) => a.severity === "alert").length;
     
-    const forecast30Day = cashFlowForecast.find((f, i) => f.isForecasted && i === 14 + 30);
-    const forecast60Day = cashFlowForecast.find((f, i) => f.isForecasted && i === 14 + 60);
-    const forecast90Day = cashFlowForecast.find((f, i) => f.isForecasted && i === 14 + 90);
+    // Find forecasted values by counting days from the start of forecasted data
+    // Historical data is 14 days, so forecasted data starts at index 14
+    const forecastedData = cashFlowForecast.filter((f) => f.isForecasted);
+    const forecast30Day = forecastedData[29]; // 30th day of forecast (index 29)
+    const forecast60Day = forecastedData[59]; // 60th day of forecast (index 59)
+    const forecast90Day = forecastedData[89]; // 90th day of forecast (index 89)
 
     // Calculate confidence in forecasts
     const forecastConfidence = Math.min(95, dataQualityScore);
