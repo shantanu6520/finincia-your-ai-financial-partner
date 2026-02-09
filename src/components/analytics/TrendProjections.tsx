@@ -19,14 +19,17 @@ const TrendProjections = ({ data, currencySymbol, formatAmount }: TrendProjectio
 
   // Find the transition point between actual and forecast
   const forecastStartIndex = data.findIndex((d) => d.forecast !== undefined);
+  const lastActualIndex = forecastStartIndex > 0 ? forecastStartIndex - 1 : data.findIndex((d) => d.actual === undefined) - 1;
 
   const seriesData = data.map((d, idx) => {
-    const isBoundaryPoint = forecastStartIndex > 0 && idx === forecastStartIndex - 1;
+    // Bridge point: last actual data point should also have forecast value to connect lines
+    const isBridgePoint = idx === lastActualIndex && lastActualIndex >= 0;
 
     return {
       ...d,
       actualSeries: d.actual,
-      forecastSeries: d.forecast !== undefined ? d.forecast : isBoundaryPoint ? d.actual : undefined,
+      // For the bridge point, use the actual value to create seamless connection
+      forecastSeries: d.forecast !== undefined ? d.forecast : (isBridgePoint ? d.actual : undefined),
     };
   });
 
