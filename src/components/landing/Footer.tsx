@@ -9,10 +9,8 @@ const footerLinks = {
     { label: "Security", href: "/security", isRoute: true },
   ],
   company: [
-    { label: "About", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Careers", href: "#" },
-    { label: "Contact", href: "#" },
+    { label: "About", href: "/about", isRoute: true },
+    { label: "Contact", href: "/contact", isRoute: true },
   ],
   legal: [
     { label: "Privacy Policy", href: "#" },
@@ -89,12 +87,21 @@ const Footer = () => {
             <ul className="space-y-4">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
-                  >
-                    {link.label}
-                  </a>
+                  {'isRoute' in link && link.isRoute ? (
+                    <Link
+                      to={link.href}
+                      className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a
+                      href={link.href}
+                      className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -121,7 +128,7 @@ const Footer = () => {
         {/* Bottom bar */}
         <div className="mt-20 pt-8 border-t border-primary-foreground/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-primary-foreground/50 text-sm">
-            © 2024 FININCIA. All rights reserved.
+            © 2024 FININCIA by Reveon Retail. All rights reserved.
           </p>
           <p className="text-primary-foreground/50 text-sm">
             Made with precision for Indian professionals
