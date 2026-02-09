@@ -20,6 +20,8 @@ import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
 import Security from "./pages/Security";
 import Subscription from "./pages/Subscription";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "@/components/dashboard/ProtectedRoute";
 import ProProtectedRoute from "@/components/dashboard/ProProtectedRoute";
@@ -38,6 +40,8 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/security" element={<Security />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
             <Route
               path="/dashboard"
               element={
