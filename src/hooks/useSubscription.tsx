@@ -155,6 +155,13 @@ export const useSubscription = () => {
         toast.error("Payment failed. Please try again.");
         setIsProcessing(false);
       });
+      
+      // Reset processing state when modal is closed without completing payment
+      razorpay.on("modal.closed", () => {
+        console.log("Razorpay modal closed");
+        setIsProcessing(false);
+      });
+      
       razorpay.open();
 
     } catch (error: any) {
