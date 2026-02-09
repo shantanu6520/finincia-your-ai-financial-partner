@@ -180,27 +180,27 @@ export const useSubscription = () => {
   };
 
   const cancelSubscription = async () => {
-    if (!subscription?.razorpay_subscription_id) {
-      toast.error("No active subscription to cancel");
+    if (!subscription) {
+      toast.error("No subscription to cancel");
       return;
     }
 
     setIsProcessing(true);
 
     try {
-      // Note: Cancellation would require another edge function
-      // For now, we'll update the local status
-      const { error } = await supabase
-        .from("subscriptions")
-        .update({
-          status: "cancelled",
-          cancelled_at: new Date().toISOString(),
-        })
-        .eq("id", subscription.id);
+      // Call the cancellation edge function
+      const { data, error } = await supabase.functions.invoke("razorpay-cancel-subscription");
 
-      if (error) throw error;
+      if (error) {
+        console.error("Cancel function error:", error);
+        throw new Error(error.message || "Failed to cancel subscription");
+      }
 
-      toast.success("Subscription cancelled");
+      if (!data?.success) {
+        throw new Error(data?.error || "Failed to cancel subscription");
+      }
+
+      toast.success("Subscription cancelled successfully");
       await fetchSubscription();
     } catch (error: any) {
       console.error("Cancel error:", error);
