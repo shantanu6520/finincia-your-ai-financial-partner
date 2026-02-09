@@ -62,7 +62,7 @@ const HeroSection = () => {
                 size="xl" 
                 className="group bg-primary-foreground text-primary hover:bg-primary-foreground/90 px-8"
               >
-                Start Free Trial
+                Subscribe Now
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
