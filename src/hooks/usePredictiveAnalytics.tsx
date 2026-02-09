@@ -698,9 +698,20 @@ export const usePredictiveAnalytics = () => {
       dailyExpenses.push(dayExpense);
     }
     
-    // Apply Holt-Winters for expense forecasting
-    const expenseModel = holtWintersSmooth(dailyExpenses, 0.3, 0.1, 0.1, 7);
-    const incomeModel = holtWintersSmooth(dailyIncomes, 0.2, 0.05, 0.05, 7);
+    // Calculate fallback values for sparse data
+    const avgDailyExpense = dailyExpenses.reduce((a, b) => a + b, 0) / 30 || totalMonthlyBills / 30 || 0;
+    const avgDailyIncome = dailyIncomes.reduce((a, b) => a + b, 0) / 30 || 0;
+    const hasEnoughExpenseData = dailyExpenses.filter(e => e > 0).length >= 7;
+    const hasEnoughIncomeData = dailyIncomes.filter(i => i > 0).length >= 3;
+    
+    // Apply Holt-Winters for expense forecasting (with fallback)
+    const expenseModel = hasEnoughExpenseData
+      ? holtWintersSmooth(dailyExpenses, 0.3, 0.1, 0.1, 7)
+      : { level: avgDailyExpense + (totalMonthlyBills / 30), trend: 0, seasonal: Array(7).fill(1) };
+    
+    const incomeModel = hasEnoughIncomeData
+      ? holtWintersSmooth(dailyIncomes, 0.2, 0.05, 0.05, 7)
+      : { level: avgDailyIncome, trend: 0, seasonal: Array(7).fill(1) };
 
     // Historical data (last 14 days)
     for (let i = 13; i >= 0; i--) {
@@ -733,9 +744,12 @@ export const usePredictiveAnalytics = () => {
       });
     }
 
-    // Forecast using Holt-Winters
+    // Forecast using Holt-Winters with fallback
     let forecastBalance = totalBalance;
-    const baseVolatility = dailyAverages.expenseVolatility || dailyAverages.expense * 0.15;
+    const baseVolatility = dailyAverages.expenseVolatility || avgDailyExpense * 0.2 || totalBalance * 0.01;
+    
+    // Calculate base daily net change for fallback
+    const baseDailyNetChange = avgDailyIncome - avgDailyExpense - (totalMonthlyBills / 30);
 
     for (let i = 1; i <= 90; i++) {
       const date = addDays(now, i);
@@ -745,10 +759,24 @@ export const usePredictiveAnalytics = () => {
       const expenseSeasonal = expenseModel.seasonal[dayOfWeek] || 1;
       const incomeSeasonal = incomeModel.seasonal[dayOfWeek] || 1;
       
-      const predictedExpense = (expenseModel.level + expenseModel.trend * i) * expenseSeasonal + (totalMonthlyBills / 30);
-      const predictedIncome = (incomeModel.level + incomeModel.trend * i) * incomeSeasonal;
+      let predictedExpense = (expenseModel.level + expenseModel.trend * i) * expenseSeasonal;
+      let predictedIncome = (incomeModel.level + incomeModel.trend * i) * incomeSeasonal;
       
-      forecastBalance += predictedIncome - predictedExpense;
+      // Add recurring bills to expenses
+      predictedExpense += totalMonthlyBills / 30;
+      
+      // Ensure reasonable values
+      if (predictedExpense < 0) predictedExpense = avgDailyExpense + (totalMonthlyBills / 30);
+      if (predictedIncome < 0) predictedIncome = avgDailyIncome;
+      
+      // Use simple projection if models produce unreasonable results
+      const dailyChange = predictedIncome - predictedExpense;
+      if (Math.abs(dailyChange) > totalBalance * 0.1) {
+        // Cap extreme daily changes
+        forecastBalance += Math.sign(dailyChange) * Math.min(Math.abs(dailyChange), totalBalance * 0.02);
+      } else {
+        forecastBalance += dailyChange;
+      }
       
       // Confidence bands widen over time with diminishing rate
       const confidenceMultiplier = 1 + Math.log10(i + 1) * 0.15;
