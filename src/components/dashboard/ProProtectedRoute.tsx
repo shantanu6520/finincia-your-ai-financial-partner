@@ -7,6 +7,11 @@ interface ProProtectedRouteProps {
   children: React.ReactNode;
 }
 
+// Whitelist of allowed email addresses
+const ALLOWED_EMAILS = [
+  "dhengre.shantanu2000@gmail.com",
+];
+
 const ProProtectedRoute = ({ children }: ProProtectedRouteProps) => {
   const { user, loading: authLoading } = useAuth();
   const { isPro, isLoading: subLoading } = useSubscription();
@@ -26,6 +31,31 @@ const ProProtectedRoute = ({ children }: ProProtectedRouteProps) => {
   // Redirect to auth if not logged in
   if (!user) {
     return <Navigate to="/auth" replace />;
+  }
+
+  // Check if user email is in whitelist
+  const isAllowedEmail = user.email && ALLOWED_EMAILS.includes(user.email.toLowerCase());
+  
+  if (!isAllowedEmail) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4 text-center max-w-md p-8">
+          <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
+            <span className="text-3xl">🔒</span>
+          </div>
+          <h1 className="text-2xl font-bold text-foreground">Access Restricted</h1>
+          <p className="text-muted-foreground">
+            FININCIA is currently in private beta. Your email ({user.email}) is not authorized to access this dashboard.
+          </p>
+          <a 
+            href="/" 
+            className="text-primary hover:underline"
+          >
+            Return to Home
+          </a>
+        </div>
+      </div>
+    );
   }
 
   // Redirect to subscription if not Pro
