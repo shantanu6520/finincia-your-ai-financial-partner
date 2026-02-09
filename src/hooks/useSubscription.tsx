@@ -24,12 +24,15 @@ interface RazorpayOptions {
   subscription_id: string;
   name: string;
   description: string;
-  handler: (response: any) => void;
+  handler: (response: any) => void | Promise<void>;
   prefill?: {
     email?: string;
   };
   theme?: {
     color?: string;
+  };
+  modal?: {
+    ondismiss?: () => void;
   };
 }
 
@@ -138,15 +141,25 @@ export const useSubscription = () => {
         name: data.name,
         description: data.description,
         handler: async (response: any) => {
-          console.log("Payment successful:", response);
-          toast.success("Subscription activated successfully!");
-          await fetchSubscription();
+          try {
+            console.log("Payment successful:", response);
+            toast.success("Subscription activated successfully!");
+            await fetchSubscription();
+          } finally {
+            setIsProcessing(false);
+          }
         },
         prefill: {
           email: user.email,
         },
         theme: {
           color: "#000000",
+        },
+        modal: {
+          ondismiss: () => {
+            console.log("Razorpay modal dismissed");
+            setIsProcessing(false);
+          },
         },
       };
 
@@ -156,11 +169,6 @@ export const useSubscription = () => {
         setIsProcessing(false);
       });
       
-      // Reset processing state when modal is closed without completing payment
-      razorpay.on("modal.closed", () => {
-        console.log("Razorpay modal closed");
-        setIsProcessing(false);
-      });
       
       razorpay.open();
 
