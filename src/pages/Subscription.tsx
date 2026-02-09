@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Check, ArrowRight, Crown, Sparkles, Shield, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,8 +23,16 @@ const features = [
 
 const Subscription = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { subscription, isLoading, isProcessing, isPro, subscribe, cancelSubscription } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<"monthly" | "annual">("annual");
+
+  // Redirect Pro users to dashboard
+  useEffect(() => {
+    if (!isLoading && isPro) {
+      navigate("/dashboard");
+    }
+  }, [isPro, isLoading, navigate]);
 
   const handleSubscribe = () => {
     subscribe(selectedPlan);

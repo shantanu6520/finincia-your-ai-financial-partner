@@ -112,12 +112,24 @@ export const useSubscription = () => {
         throw new Error("Not authenticated");
       }
 
+      console.log("Creating subscription for plan:", planType);
+
       // Create subscription via edge function
       const { data, error } = await supabase.functions.invoke("razorpay-subscription", {
         body: { planType },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Edge function error:", error);
+        throw error;
+      }
+
+      if (!data?.subscription_id || !data?.key_id) {
+        console.error("Invalid response from subscription API:", data);
+        throw new Error("Invalid subscription response");
+      }
+
+      console.log("Subscription created, opening Razorpay checkout:", data);
 
       // Open Razorpay checkout
       const options: RazorpayOptions = {
@@ -141,13 +153,13 @@ export const useSubscription = () => {
       const razorpay = new window.Razorpay(options);
       razorpay.on("payment.failed", () => {
         toast.error("Payment failed. Please try again.");
+        setIsProcessing(false);
       });
       razorpay.open();
 
     } catch (error: any) {
       console.error("Subscription error:", error);
       toast.error(error.message || "Failed to start subscription");
-    } finally {
       setIsProcessing(false);
     }
   };
