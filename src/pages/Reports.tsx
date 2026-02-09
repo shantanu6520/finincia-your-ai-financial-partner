@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { FileText, BarChart3, Bell, Loader2, Calendar } from "lucide-react";
+import { FileText, BarChart3, Loader2, Calendar } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { useFinancialReview } from "@/hooks/useFinancialReview";
@@ -11,11 +11,10 @@ import WinsAndGaps from "@/components/reports/WinsAndGaps";
 import ActionPlan from "@/components/reports/ActionPlan";
 import NetWorthSnapshot from "@/components/reports/NetWorthSnapshot";
 import PDFReportGenerator from "@/components/reports/PDFReportGenerator";
-import NotificationSettings from "@/components/reports/NotificationSettings";
 
 const Reports = () => {
   const { isLoading, reviewData } = useFinancialReview();
-  const { profile, updateProfile, isUpdating } = useProfile();
+  const { profile } = useProfile();
   const [activeTab, setActiveTab] = useState("review");
 
   if (isLoading) {
@@ -38,7 +37,7 @@ const Reports = () => {
               Financial Reports
             </h1>
             <p className="text-muted-foreground mt-1">
-              AI-powered quarterly reviews, reports, and notifications
+              AI-powered quarterly reviews and downloadable reports
             </p>
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/50 px-4 py-2 rounded-lg">
@@ -50,7 +49,7 @@ const Reports = () => {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid">
+          <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:inline-grid">
             <TabsTrigger value="review" className="gap-2">
               <BarChart3 className="w-4 h-4" />
               <span className="hidden sm:inline">Quarterly Review</span>
@@ -60,11 +59,6 @@ const Reports = () => {
               <FileText className="w-4 h-4" />
               <span className="hidden sm:inline">PDF Reports</span>
               <span className="sm:hidden">Reports</span>
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="gap-2">
-              <Bell className="w-4 h-4" />
-              <span className="hidden sm:inline">Notifications</span>
-              <span className="sm:hidden">Alerts</span>
             </TabsTrigger>
           </TabsList>
 
@@ -147,20 +141,6 @@ const Reports = () => {
                 <p>Your generated reports will appear here</p>
                 <p className="text-sm mt-1">Download a report to get started</p>
               </div>
-            </motion.div>
-          </TabsContent>
-
-          {/* Notifications Tab */}
-          <TabsContent value="notifications" className="mt-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <NotificationSettings
-                profile={profile}
-                onSave={updateProfile}
-                isUpdating={isUpdating}
-              />
             </motion.div>
           </TabsContent>
         </Tabs>
