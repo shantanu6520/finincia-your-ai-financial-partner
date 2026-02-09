@@ -22,9 +22,16 @@ const PLANS = {
 }
 
 async function razorpayRequest(endpoint: string, method: string, body?: any) {
-  const keyId = Deno.env.get('RAZORPAY_KEY_ID')!
-  const keySecret = Deno.env.get('RAZORPAY_KEY_SECRET')!
+  const keyId = Deno.env.get('RAZORPAY_KEY_ID')
+  const keySecret = Deno.env.get('RAZORPAY_KEY_SECRET')
+
+  if (!keyId || !keySecret) {
+    console.error('Razorpay API keys not configured')
+    throw new Error('Razorpay API keys not configured. Please add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in Edge Function secrets.')
+  }
+
   const auth = btoa(`${keyId}:${keySecret}`)
+  console.log(`Making Razorpay API call to ${endpoint}`)
 
   const response = await fetch(`https://api.razorpay.com/v1${endpoint}`, {
     method,
@@ -35,7 +42,21 @@ async function razorpayRequest(endpoint: string, method: string, body?: any) {
     body: body ? JSON.stringify(body) : undefined,
   })
 
-  const data = await response.json()
+  // Defensive response parsing - check content type before parsing
+  const contentType = response.headers.get('content-type')
+  if (!contentType?.includes('application/json')) {
+    const textResponse = await response.text()
+    console.error('Razorpay returned non-JSON response:', textResponse.substring(0, 500))
+    throw new Error('Razorpay returned an invalid response. Please check your API keys.')
+  }
+
+  let data
+  try {
+    data = await response.json()
+  } catch (parseError) {
+    console.error('Failed to parse Razorpay response:', parseError)
+    throw new Error('Razorpay returned a malformed response')
+  }
   
   if (!response.ok) {
     console.error('Razorpay API error:', data)
