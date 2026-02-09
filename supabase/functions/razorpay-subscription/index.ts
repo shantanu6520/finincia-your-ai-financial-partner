@@ -164,14 +164,14 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Check for existing active subscription
+    // Check for existing subscription (any status)
     const { data: existingSub } = await supabase
       .from('subscriptions')
       .select('*')
       .eq('user_id', userId)
-      .in('status', ['active', 'pending'])
       .maybeSingle()
 
+    // Block if already active
     if (existingSub?.status === 'active') {
       return new Response(
         JSON.stringify({ error: 'You already have an active subscription' }),
@@ -182,11 +182,11 @@ Deno.serve(async (req) => {
     // Get or create plan
     const planId = await getOrCreatePlan(planType)
     
-    // Create Razorpay subscription
+    // Create Razorpay subscription (reuse customer ID if available)
     const razorpayCustomerId = existingSub?.razorpay_customer_id || null
     const razorpaySub = await createSubscription(planId, razorpayCustomerId, userEmail)
 
-    // Upsert subscription in database
+    // Subscription data for database
     const subscriptionData = {
       user_id: userId,
       razorpay_subscription_id: razorpaySub.id,
@@ -195,17 +195,25 @@ Deno.serve(async (req) => {
       status: 'pending',
       amount: PLANS[planType as 'monthly' | 'annual'].amount,
       currency: 'INR',
+      cancelled_at: null, // Clear cancelled_at for re-subscription
+      current_period_start: null,
+      current_period_end: null,
     }
 
+    // Update existing record or insert new one
     if (existingSub) {
+      // Update existing subscription record (handles cancelled, expired, etc.)
       await supabase
         .from('subscriptions')
         .update(subscriptionData)
         .eq('id', existingSub.id)
+      console.log(`Updated existing subscription record: ${existingSub.id}`)
     } else {
+      // Create new subscription record
       await supabase
         .from('subscriptions')
         .insert(subscriptionData)
+      console.log('Created new subscription record')
     }
 
     // Return subscription details for frontend checkout
