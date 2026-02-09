@@ -101,7 +101,7 @@ async function getOrCreatePlan(planType: 'monthly' | 'annual') {
 async function createSubscription(planId: string, customerId: string | null, userEmail: string) {
   const subscriptionData: any = {
     plan_id: planId,
-    total_count: 120, // Max billing cycles
+    total_count: 100, // Max billing cycles (Razorpay limit)
     quantity: 1,
     customer_notify: 1,
   }
