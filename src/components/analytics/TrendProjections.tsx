@@ -18,7 +18,17 @@ const TrendProjections = ({ data, currencySymbol, formatAmount }: TrendProjectio
   const [showForecast, setShowForecast] = useState(true);
 
   // Find the transition point between actual and forecast
-  const todayIndex = data.findIndex((d) => d.forecast !== undefined);
+  const forecastStartIndex = data.findIndex((d) => d.forecast !== undefined);
+
+  const seriesData = data.map((d, idx) => {
+    const isBoundaryPoint = forecastStartIndex > 0 && idx === forecastStartIndex - 1;
+
+    return {
+      ...d,
+      actualSeries: d.actual,
+      forecastSeries: d.forecast !== undefined ? d.forecast : isBoundaryPoint ? d.actual : undefined,
+    };
+  });
 
   return (
     <Card className="border-border/50">
@@ -66,7 +76,7 @@ const TrendProjections = ({ data, currencySymbol, formatAmount }: TrendProjectio
         {/* Chart */}
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
+            <LineChart data={seriesData}>
               <XAxis 
                 dataKey="date" 
                 axisLine={false} 
@@ -92,9 +102,9 @@ const TrendProjections = ({ data, currencySymbol, formatAmount }: TrendProjectio
                   name === "actual" ? "Actual Spending" : "Projected Spending"
                 ]}
               />
-              {todayIndex > 0 && (
+              {forecastStartIndex > 0 && (
                 <ReferenceLine 
-                  x={data[todayIndex - 1]?.date} 
+                  x={data[forecastStartIndex - 1]?.date} 
                   stroke="hsl(var(--border))" 
                   strokeDasharray="3 3"
                   label={{ 
@@ -108,7 +118,7 @@ const TrendProjections = ({ data, currencySymbol, formatAmount }: TrendProjectio
               {showActual && (
                 <Line
                   type="monotone"
-                  dataKey="actual"
+                  dataKey="actualSeries"
                   stroke="hsl(var(--foreground))"
                   strokeWidth={2}
                   dot={false}
@@ -119,7 +129,7 @@ const TrendProjections = ({ data, currencySymbol, formatAmount }: TrendProjectio
               {showForecast && (
                 <Line
                   type="monotone"
-                  dataKey="forecast"
+                  dataKey="forecastSeries"
                   stroke="hsl(var(--primary))"
                   strokeWidth={2}
                   strokeDasharray="8 4"
