@@ -1056,17 +1056,43 @@ export const usePredictiveAnalytics = () => {
       });
     }
 
-    // Apply Holt-Winters for smarter forecast
-    const model = holtWintersSmooth(dailyExpenses, 0.3, 0.1, 0.1, 7);
-    const baseVolatility = stdDev(dailyExpenses);
+    // Calculate average daily expense for fallback
+    const avgDailyExpense = dailyExpenses.length > 0 
+      ? dailyExpenses.reduce((a, b) => a + b, 0) / dailyExpenses.length 
+      : totalMonthlyBills / 30;
+    
+    // Use fallback if no expenses recorded
+    const baseForecastValue = avgDailyExpense > 0 ? avgDailyExpense : (totalMonthlyBills / 30) || 500;
 
+    // Apply Holt-Winters for smarter forecast (with fallback for sparse data)
+    const hasEnoughData = dailyExpenses.filter(e => e > 0).length >= 7;
+    const model = hasEnoughData 
+      ? holtWintersSmooth(dailyExpenses, 0.3, 0.1, 0.1, 7)
+      : { level: baseForecastValue, trend: 0, seasonal: Array(7).fill(1) };
+    
+    const baseVolatility = stdDev(dailyExpenses) || baseForecastValue * 0.2;
+
+    // Add the last actual value as bridge point for smooth transition
+    const lastActualValue = data[data.length - 1]?.actual || baseForecastValue;
+    
     // Forecast (next 30 days)
     for (let i = 1; i <= 30; i++) {
       const date = addDays(now, i);
       const dayOfWeek = i % 7;
       
       const seasonal = model.seasonal[dayOfWeek] || 1;
-      const forecast = (model.level + model.trend * i) * seasonal;
+      let forecast = (model.level + model.trend * i) * seasonal;
+      
+      // Ensure forecast is reasonable (not zero or negative when we have data)
+      if (forecast <= 0 && baseForecastValue > 0) {
+        forecast = baseForecastValue * seasonal;
+      }
+      
+      // Smooth transition from last actual value for first few days
+      if (i <= 3) {
+        const blendRatio = i / 4;
+        forecast = lastActualValue * (1 - blendRatio) + forecast * blendRatio;
+      }
       
       // Confidence bands
       const confidenceWidth = baseVolatility * Math.sqrt(i) * 0.5;
@@ -1080,7 +1106,7 @@ export const usePredictiveAnalytics = () => {
     }
 
     return data;
-  }, [transactions, now]);
+  }, [transactions, now, totalMonthlyBills]);
 
   // ============ ENHANCED SUMMARY STATS ============
   const summary = useMemo(() => {
