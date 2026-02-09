@@ -1,15 +1,29 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { User, Save, Loader2 } from "lucide-react";
+import { User, Save, Loader2, Crown, Calendar, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
+import { format } from "date-fns";
 
 const currencies = [
   { value: "INR", label: "₹ INR - Indian Rupee" },
@@ -46,6 +60,7 @@ const financialYearMonths = [
 const Profile = () => {
   const { user } = useAuth();
   const { profile, isLoading, updateProfile, isUpdating } = useProfile();
+  const { subscription, isPro, isExpiringSoon, daysRemaining, cancelSubscription, isProcessing } = useSubscription();
   
   const [formData, setFormData] = useState({
     name: profile?.name || "",
@@ -110,6 +125,125 @@ const Profile = () => {
                   <p className="text-sm text-muted-foreground">{user?.email}</p>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Subscription Status */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+        >
+          <Card className={`border-2 ${isPro ? "border-primary" : "border-border/50"}`}>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Crown className={`w-5 h-5 ${isPro ? "text-primary" : "text-muted-foreground"}`} />
+                  <CardTitle className="text-lg">Subscription</CardTitle>
+                </div>
+                {isPro && (
+                  <Badge variant="default" className="bg-primary">
+                    PRO
+                  </Badge>
+                )}
+              </div>
+              <CardDescription>
+                {isPro ? "You have full access to all FININCIA features" : "Upgrade to unlock all features"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {subscription && isPro ? (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">Plan</p>
+                      <p className="font-medium">
+                        {subscription.plan_type === "annual" ? "Annual" : "Monthly"} Plan
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">Amount</p>
+                      <p className="font-medium">
+                        ₹{(subscription.amount / 100).toLocaleString()}/{subscription.plan_type === "annual" ? "year" : "month"}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">Status</p>
+                      <Badge variant={subscription.status === "active" ? "default" : "secondary"}>
+                        {subscription.status.toUpperCase()}
+                      </Badge>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">Days Remaining</p>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                        <span className={`font-medium ${isExpiringSoon ? "text-destructive" : ""}`}>
+                          {daysRemaining} days
+                        </span>
+                        {isExpiringSoon && (
+                          <AlertTriangle className="w-4 h-4 text-destructive" />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {subscription.current_period_end && (
+                    <div className="pt-2 border-t border-border">
+                      <p className="text-sm text-muted-foreground">
+                        {isExpiringSoon ? "Expires" : "Renews"} on{" "}
+                        <span className="font-medium text-foreground">
+                          {format(new Date(subscription.current_period_end), "MMMM d, yyyy")}
+                        </span>
+                      </p>
+                    </div>
+                  )}
+
+                  <Separator />
+
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" className="w-full" disabled={isProcessing}>
+                        {isProcessing ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Cancelling...
+                          </>
+                        ) : (
+                          "Cancel Subscription"
+                        )}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Cancel Subscription?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to cancel your FININCIA Pro subscription? 
+                          You will lose access to all Pro features immediately. This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Keep Subscription</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={cancelSubscription}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Yes, Cancel
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </>
+              ) : (
+                <div className="text-center py-4">
+                  <p className="text-muted-foreground mb-4">
+                    You don't have an active subscription
+                  </p>
+                  <Button asChild>
+                    <a href="/subscription">Upgrade to Pro</a>
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </motion.div>
