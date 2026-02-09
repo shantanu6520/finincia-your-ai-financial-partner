@@ -210,10 +210,26 @@ export const useSubscription = () => {
     }
   };
 
-  const isPro = subscription?.status === "active";
+  // Check if subscription is active AND within the valid period
+  const isPro = (() => {
+    if (subscription?.status !== "active") return false;
+    
+    // If no period end date, assume active (shouldn't happen normally)
+    if (!subscription.current_period_end) return true;
+    
+    // Check if current date is before the period end date
+    const periodEnd = new Date(subscription.current_period_end);
+    const now = new Date();
+    return now < periodEnd;
+  })();
+
   const isExpiringSoon = subscription?.current_period_end 
-    ? new Date(subscription.current_period_end) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    ? new Date(subscription.current_period_end) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) && isPro
     : false;
+  
+  const daysRemaining = subscription?.current_period_end
+    ? Math.max(0, Math.ceil((new Date(subscription.current_period_end).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : 0;
 
   return {
     subscription,
@@ -221,6 +237,7 @@ export const useSubscription = () => {
     isProcessing,
     isPro,
     isExpiringSoon,
+    daysRemaining,
     subscribe,
     cancelSubscription,
     refetch: fetchSubscription,
