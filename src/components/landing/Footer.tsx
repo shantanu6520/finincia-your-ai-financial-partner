@@ -20,7 +20,7 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { icon: Instagram, href: "#", label: "Instagram" },
+  { icon: Instagram, href: "https://www.instagram.com/finincia.ai?igsh=dGJtMnc4aWd4d2ln", label: "Instagram" },
 ];
 
 const Footer = () => {
