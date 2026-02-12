@@ -1,22 +1,40 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, TrendingUp, Shield, Brain } from "lucide-react";
 import { Link } from "react-router-dom";
-import fininciaLogo from "@/assets/finincia-logo.png";
+import { useState, useEffect } from "react";
+import screenshotDashboard from "@/assets/screenshots/dashboard.png";
+import screenshotAnalytics from "@/assets/screenshots/analytics.png";
+import screenshotReports from "@/assets/screenshots/reports.png";
+import screenshotAICoach from "@/assets/screenshots/ai-coach.png";
+import screenshotLoan from "@/assets/screenshots/loan-strategist.png";
+import screenshotBills from "@/assets/screenshots/bill-optimizer.png";
+
+const screenshots = [
+  { src: screenshotDashboard, label: "Dashboard" },
+  { src: screenshotAnalytics, label: "Predictive Analytics" },
+  { src: screenshotReports, label: "Financial Reports" },
+  { src: screenshotAICoach, label: "AI Coach" },
+  { src: screenshotLoan, label: "Loan Strategist" },
+  { src: screenshotBills, label: "Bill Optimizer" },
+];
 
 const HeroSection = () => {
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrent((c) => (c + 1) % screenshots.length), 4000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <section className="relative min-h-screen bg-hero overflow-hidden">
-      {/* Subtle grid pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:80px_80px]" />
-      
-      {/* Gradient orbs - subtle monochrome */}
       <div className="absolute top-20 right-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
       <div className="absolute bottom-20 left-1/4 w-80 h-80 bg-white/3 rounded-full blur-3xl" />
 
       <div className="relative container mx-auto px-4 pt-32 pb-20">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -26,7 +44,6 @@ const HeroSection = () => {
             <span className="text-sm font-medium tracking-wide text-primary-foreground/80">AI-Powered Financial Intelligence</span>
           </motion.div>
 
-          {/* Headline */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -39,7 +56,6 @@ const HeroSection = () => {
             Powered by AI
           </motion.h1>
 
-          {/* Subheadline */}
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -50,7 +66,6 @@ const HeroSection = () => {
             intelligent insights that help you save more, spend smarter, and build wealth.
           </motion.p>
 
-          {/* CTA Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -77,7 +92,6 @@ const HeroSection = () => {
             </a>
           </motion.div>
 
-          {/* Trust indicators */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -99,7 +113,7 @@ const HeroSection = () => {
           </motion.div>
         </div>
 
-        {/* Dashboard Preview */}
+        {/* Screenshot Carousel */}
         <motion.div
           initial={{ opacity: 0, y: 60 }}
           animate={{ opacity: 1, y: 0 }}
@@ -107,10 +121,8 @@ const HeroSection = () => {
           className="mt-24 max-w-5xl mx-auto"
         >
           <div className="relative">
-            {/* Glow effect - subtle */}
             <div className="absolute -inset-4 bg-gradient-to-r from-white/10 via-white/5 to-white/10 rounded-3xl blur-2xl" />
             
-            {/* Dashboard mockup */}
             <div className="relative bg-card rounded-2xl shadow-2xl border border-border/50 overflow-hidden">
               {/* Browser bar */}
               <div className="flex items-center gap-2 px-4 py-3 bg-secondary/80 border-b border-border/50">
@@ -121,47 +133,43 @@ const HeroSection = () => {
                 </div>
                 <div className="flex-1 mx-4">
                   <div className="max-w-md mx-auto bg-background/50 rounded-md px-4 py-1.5 text-xs text-muted-foreground">
-                    app.finincia.in/dashboard
+                    app.finincia.in/{screenshots[current].label.toLowerCase().replace(/\s+/g, '-')}
                   </div>
                 </div>
               </div>
               
-              {/* Dashboard content */}
-              <div className="p-6 md:p-8 bg-background">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <DashboardCard
-                    title="Total Balance"
-                    value="₹4,85,230"
-                    change="+12.5%"
-                    positive
+              {/* Screenshot */}
+              <div className="relative aspect-[16/9] bg-background overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.img
+                    key={current}
+                    src={screenshots[current].src}
+                    alt={`FININCIA ${screenshots[current].label}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="w-full h-full object-cover object-top"
                   />
-                  <DashboardCard
-                    title="Monthly Savings"
-                    value="₹52,400"
-                    change="+8.2%"
-                    positive
-                  />
-                  <DashboardCard
-                    title="Debt Cleared"
-                    value="₹1,20,000"
-                    change="3 months ahead"
-                    positive
-                  />
-                </div>
-                
-                {/* Chart placeholder */}
-                <div className="bg-secondary/50 rounded-xl p-4 h-48 flex items-end justify-between gap-2">
-                  {[65, 45, 80, 55, 90, 70, 85, 60, 95, 75, 88, 92].map((height, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ height: 0 }}
-                      animate={{ height: `${height}%` }}
-                      transition={{ duration: 0.5, delay: 0.6 + i * 0.05 }}
-                      className="flex-1 bg-gradient-to-t from-foreground to-foreground/60 rounded-t-sm"
-                    />
-                  ))}
-                </div>
+                </AnimatePresence>
               </div>
+            </div>
+
+            {/* Dots & labels */}
+            <div className="flex justify-center gap-3 mt-6">
+              {screenshots.map((s, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrent(i)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                    i === current
+                      ? 'bg-primary-foreground text-primary'
+                      : 'bg-primary-foreground/10 text-primary-foreground/50 hover:bg-primary-foreground/20'
+                  }`}
+                >
+                  {s.label}
+                </button>
+              ))}
             </div>
           </div>
         </motion.div>
@@ -169,25 +177,5 @@ const HeroSection = () => {
     </section>
   );
 };
-
-const DashboardCard = ({ 
-  title, 
-  value, 
-  change, 
-  positive 
-}: { 
-  title: string; 
-  value: string; 
-  change: string; 
-  positive?: boolean;
-}) => (
-  <div className="bg-secondary/50 rounded-xl p-4 border border-border/50">
-    <p className="text-sm text-muted-foreground mb-1">{title}</p>
-    <p className="text-2xl font-bold font-display text-foreground">{value}</p>
-    <p className={`text-sm mt-1 ${positive ? 'text-foreground/70' : 'text-foreground/50'}`}>
-      {change}
-    </p>
-  </div>
-);
 
 export default HeroSection;
