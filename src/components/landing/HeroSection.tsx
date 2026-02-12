@@ -120,19 +120,21 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="mt-24 max-w-5xl mx-auto"
         >
-          <div className="relative">
-            <div className="absolute -inset-4 bg-gradient-to-r from-white/10 via-white/5 to-white/10 rounded-3xl blur-2xl" />
+          <div className="relative group">
+            {/* Layered glow effects */}
+            <div className="absolute -inset-6 bg-gradient-to-r from-white/5 via-white/10 to-white/5 rounded-[2rem] blur-3xl opacity-60 group-hover:opacity-80 transition-opacity duration-700" />
+            <div className="absolute -inset-1 bg-gradient-to-b from-white/20 via-transparent to-white/5 rounded-[1.25rem] opacity-50" />
             
-            <div className="relative bg-card rounded-2xl shadow-2xl border border-border/50 overflow-hidden">
+            <div className="relative bg-card/80 backdrop-blur-sm rounded-2xl shadow-[0_30px_80px_-20px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden">
               {/* Browser bar */}
-              <div className="flex items-center gap-2 px-4 py-3 bg-secondary/80 border-b border-border/50">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-foreground/20" />
-                  <div className="w-3 h-3 rounded-full bg-foreground/20" />
-                  <div className="w-3 h-3 rounded-full bg-foreground/20" />
+              <div className="flex items-center gap-2 px-5 py-3.5 bg-gradient-to-r from-secondary/90 to-secondary/70 border-b border-white/10">
+                <div className="flex gap-2">
+                  <div className="w-3 h-3 rounded-full bg-foreground/15 ring-1 ring-foreground/10" />
+                  <div className="w-3 h-3 rounded-full bg-foreground/15 ring-1 ring-foreground/10" />
+                  <div className="w-3 h-3 rounded-full bg-foreground/15 ring-1 ring-foreground/10" />
                 </div>
                 <div className="flex-1 mx-4">
-                  <div className="max-w-md mx-auto bg-background/50 rounded-md px-4 py-1.5 text-xs text-muted-foreground">
+                  <div className="max-w-md mx-auto bg-background/40 backdrop-blur-sm rounded-lg px-4 py-1.5 text-xs text-muted-foreground/70 border border-white/5 font-mono tracking-wide">
                     app.finincia.in/{screenshots[current].label.toLowerCase().replace(/\s+/g, '-')}
                   </div>
                 </div>
@@ -145,26 +147,26 @@ const HeroSection = () => {
                     key={current}
                     src={screenshots[current].src}
                     alt={`FININCIA ${screenshots[current].label}`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
+                    initial={{ opacity: 0, scale: 1.02 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    transition={{ duration: 0.6, ease: "easeInOut" }}
                     className="w-full h-auto block"
                   />
                 </AnimatePresence>
               </div>
             </div>
 
-            {/* Dots & labels */}
-            <div className="flex justify-center gap-3 mt-6">
+            {/* Navigation pills */}
+            <div className="flex justify-center gap-2 mt-8">
               {screenshots.map((s, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrent(i)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  className={`px-4 py-2 rounded-full text-xs font-medium tracking-wide transition-all duration-300 border backdrop-blur-sm ${
                     i === current
-                      ? 'bg-primary-foreground text-primary'
-                      : 'bg-primary-foreground/10 text-primary-foreground/50 hover:bg-primary-foreground/20'
+                      ? 'bg-primary-foreground text-primary border-primary-foreground shadow-[0_0_20px_rgba(255,255,255,0.15)]'
+                      : 'bg-white/5 text-primary-foreground/40 border-white/10 hover:bg-white/10 hover:text-primary-foreground/70'
                   }`}
                 >
                   {s.label}
