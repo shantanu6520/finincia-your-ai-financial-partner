@@ -140,20 +140,18 @@ const HeroSection = () => {
                 </div>
               </div>
               
-              {/* Screenshot */}
+              {/* Screenshot - crossfade */}
               <div className="relative bg-background overflow-hidden">
-                <AnimatePresence mode="wait">
+                {screenshots.map((s, i) => (
                   <motion.img
-                    key={current}
-                    src={screenshots[current].src}
-                    alt={`FININCIA ${screenshots[current].label}`}
-                    initial={{ opacity: 0, scale: 1.02 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.98 }}
-                    transition={{ duration: 0.6, ease: "easeInOut" }}
-                    className="w-full h-auto block"
+                    key={i}
+                    src={s.src}
+                    alt={`FININCIA ${s.label}`}
+                    animate={{ opacity: i === current ? 1 : 0 }}
+                    transition={{ duration: 0.7, ease: "easeInOut" }}
+                    className={`w-full h-auto block ${i === current ? 'relative' : 'absolute inset-0'}`}
                   />
-                </AnimatePresence>
+                ))}
               </div>
             </div>
 
