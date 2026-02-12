@@ -143,6 +143,18 @@ export const useSubscription = () => {
         handler: async (response: any) => {
           try {
             console.log("Payment successful:", response);
+            toast.loading("Verifying payment...");
+            
+            // Verify payment with backend and activate subscription
+            const { data: verifyData, error: verifyError } = await supabase.functions.invoke("verify-payment");
+            
+            if (verifyError) {
+              console.error("Verification error:", verifyError);
+              // Even if verification fails, try fetching - webhook might have updated it
+            }
+            
+            console.log("Verification result:", verifyData);
+            toast.dismiss();
             toast.success("Subscription activated successfully!");
             await fetchSubscription();
           } finally {

@@ -23,8 +23,8 @@ Deno.serve(async (req) => {
     const body = await req.text()
     const signature = req.headers.get('x-razorpay-signature')
     
-    // Verify webhook signature
-    const webhookSecret = Deno.env.get('RAZORPAY_KEY_SECRET')!
+    // Verify webhook signature - use the dedicated webhook secret
+    const webhookSecret = Deno.env.get('RAZORPAY_WEBHOOK_SECRET')!
     
     if (signature && !verifyWebhookSignature(body, signature, webhookSecret)) {
       console.error('Invalid webhook signature')
