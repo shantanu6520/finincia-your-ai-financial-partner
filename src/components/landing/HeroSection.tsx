@@ -139,7 +139,7 @@ const HeroSection = () => {
               </div>
               
               {/* Screenshot */}
-              <div className="relative aspect-[16/9] bg-background overflow-hidden">
+              <div className="relative bg-background overflow-hidden">
                 <AnimatePresence mode="wait">
                   <motion.img
                     key={current}
@@ -149,7 +149,7 @@ const HeroSection = () => {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.5 }}
-                    className="w-full h-full object-cover object-top"
+                    className="w-full h-auto block"
                   />
                 </AnimatePresence>
               </div>
