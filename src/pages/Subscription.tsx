@@ -85,7 +85,7 @@ const Subscription = () => {
                         <Shield className="w-6 h-6 text-muted-foreground" />
                       )}
                     </div>
-                    <div>
+                    <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <h3 className="font-semibold">
                           FININCIA Pro {subscription.plan_type === "annual" ? "Annual" : "Monthly"}
@@ -94,13 +94,30 @@ const Subscription = () => {
                           {subscription.status.toUpperCase()}
                         </Badge>
                       </div>
-                      {subscription.status !== 'cancelled' && subscription.current_period_end && (
-                        <p className="text-sm text-muted-foreground">
-                          {isPro
-                            ? `Renews on ${format(new Date(subscription.current_period_end), "MMMM d, yyyy")}`
-                            : `Expired on ${format(new Date(subscription.current_period_end), "MMMM d, yyyy")}`}
-                        </p>
-                      )}
+                      <div className="space-y-0.5">
+                        {subscription.created_at && (
+                          <p className="text-sm text-muted-foreground">
+                            Purchased on {format(new Date(subscription.created_at), "MMMM d, yyyy")}
+                          </p>
+                        )}
+                        {subscription.current_period_start && subscription.status !== 'cancelled' && (
+                          <p className="text-sm text-muted-foreground">
+                            Current period started {format(new Date(subscription.current_period_start), "MMMM d, yyyy")}
+                          </p>
+                        )}
+                        {subscription.status === 'cancelled' && subscription.cancelled_at && (
+                          <p className="text-sm text-muted-foreground">
+                            Cancelled on {format(new Date(subscription.cancelled_at), "MMMM d, yyyy")}
+                          </p>
+                        )}
+                        {subscription.status !== 'cancelled' && subscription.current_period_end && (
+                          <p className="text-sm text-muted-foreground">
+                            {isPro
+                              ? `Renews on ${format(new Date(subscription.current_period_end), "MMMM d, yyyy")}`
+                              : `Expired on ${format(new Date(subscription.current_period_end), "MMMM d, yyyy")}`}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                   {isPro && (
