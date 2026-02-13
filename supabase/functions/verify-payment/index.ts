@@ -99,16 +99,35 @@ Deno.serve(async (req) => {
     console.log('Razorpay subscription status:', rzpSub.status)
 
     if (rzpSub.status === 'active' || rzpSub.status === 'authenticated') {
+      // Determine period dates from Razorpay or calculate fallback
+      const now = new Date()
+      let periodStart: string
+      let periodEnd: string
+
+      if (rzpSub.current_start) {
+        periodStart = new Date(rzpSub.current_start * 1000).toISOString()
+      } else {
+        periodStart = now.toISOString()
+      }
+
+      if (rzpSub.current_end) {
+        periodEnd = new Date(rzpSub.current_end * 1000).toISOString()
+      } else {
+        // Fallback: calculate based on plan_type from DB
+        const endDate = new Date(now)
+        if (subscription.plan_type === 'annual') {
+          endDate.setFullYear(endDate.getFullYear() + 1)
+        } else {
+          endDate.setMonth(endDate.getMonth() + 1)
+        }
+        periodEnd = endDate.toISOString()
+      }
+
       const updateData: any = {
         status: 'active',
         razorpay_customer_id: rzpSub.customer_id || subscription.razorpay_customer_id,
-      }
-
-      if (rzpSub.current_start) {
-        updateData.current_period_start = new Date(rzpSub.current_start * 1000).toISOString()
-      }
-      if (rzpSub.current_end) {
-        updateData.current_period_end = new Date(rzpSub.current_end * 1000).toISOString()
+        current_period_start: periodStart,
+        current_period_end: periodEnd,
       }
 
       const { error: updateError } = await supabase

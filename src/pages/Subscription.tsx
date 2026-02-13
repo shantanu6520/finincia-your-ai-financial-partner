@@ -27,12 +27,7 @@ const Subscription = () => {
   const { subscription, isLoading, isProcessing, isPro, subscribe, cancelSubscription } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<"monthly" | "annual">("annual");
 
-  // Redirect Pro users to dashboard
-  useEffect(() => {
-    if (!isLoading && isPro) {
-      navigate("/dashboard");
-    }
-  }, [isPro, isLoading, navigate]);
+  // No redirect - Pro users should be able to view their subscription status
 
   const handleSubscribe = () => {
     subscribe(selectedPlan);

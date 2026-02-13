@@ -81,13 +81,38 @@ Deno.serve(async (req) => {
       case 'subscription.activated':
       case 'subscription.charged': {
         const subEntity = payload.subscription.entity
+        const now = new Date()
+        
+        // Calculate period dates with fallback
+        let periodStart: string
+        let periodEnd: string
+
+        if (subEntity.current_start) {
+          periodStart = new Date(subEntity.current_start * 1000).toISOString()
+        } else {
+          periodStart = now.toISOString()
+        }
+
+        if (subEntity.current_end) {
+          periodEnd = new Date(subEntity.current_end * 1000).toISOString()
+        } else {
+          // Fallback based on plan type from DB
+          const endDate = new Date(now)
+          if (subscription.plan_type === 'annual') {
+            endDate.setFullYear(endDate.getFullYear() + 1)
+          } else {
+            endDate.setMonth(endDate.getMonth() + 1)
+          }
+          periodEnd = endDate.toISOString()
+        }
+
         await supabase
           .from('subscriptions')
           .update({
             status: 'active',
             razorpay_customer_id: subEntity.customer_id,
-            current_period_start: new Date(subEntity.current_start * 1000).toISOString(),
-            current_period_end: new Date(subEntity.current_end * 1000).toISOString(),
+            current_period_start: periodStart,
+            current_period_end: periodEnd,
           })
           .eq('id', subscription.id)
         console.log('Subscription activated:', subscription.id)
