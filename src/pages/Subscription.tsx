@@ -94,7 +94,7 @@ const Subscription = () => {
                           {subscription.status.toUpperCase()}
                         </Badge>
                       </div>
-                      {subscription.current_period_end && (
+                      {subscription.status !== 'cancelled' && subscription.current_period_end && (
                         <p className="text-sm text-muted-foreground">
                           {isPro
                             ? `Renews on ${format(new Date(subscription.current_period_end), "MMMM d, yyyy")}`
