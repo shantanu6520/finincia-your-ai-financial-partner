@@ -26,7 +26,15 @@ Deno.serve(async (req) => {
     // Verify webhook signature - use the dedicated webhook secret
     const webhookSecret = Deno.env.get('RAZORPAY_WEBHOOK_SECRET')!
     
-    if (signature && !verifyWebhookSignature(body, signature, webhookSecret)) {
+    if (!signature) {
+      console.error('Missing webhook signature')
+      return new Response(
+        JSON.stringify({ error: 'Missing signature' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    if (!verifyWebhookSignature(body, signature, webhookSecret)) {
       console.error('Invalid webhook signature')
       return new Response(
         JSON.stringify({ error: 'Invalid signature' }),
