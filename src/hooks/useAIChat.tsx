@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface Message {
   role: "user" | "assistant";
@@ -39,11 +40,19 @@ export const useAIChat = ({ type, context }: UseAIChatOptions) => {
       };
 
       try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (!sessionData.session) {
+          toast.error("Please log in to use the AI coach.");
+          setIsLoading(false);
+          setMessages((prev) => prev.slice(0, -1));
+          return;
+        }
+
         const response = await fetch(CHAT_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            Authorization: `Bearer ${sessionData.session.access_token}`,
           },
           body: JSON.stringify({
             messages: [...messages, userMsg],
