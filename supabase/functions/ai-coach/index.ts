@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -1724,7 +1725,99 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, type, context }: RequestBody = await req.json();
+    // ========== AUTHENTICATION ==========
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: userData, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !userData.user) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const userId = userData.user.id;
+
+    // ========== INPUT VALIDATION ==========
+    const rawBody = await req.json();
+
+    const { messages, type, context } = rawBody as RequestBody;
+
+    // Validate type
+    if (!type || !["coach", "loan", "bill"].includes(type)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid request: type must be coach, loan, or bill" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate messages
+    if (!Array.isArray(messages) || messages.length === 0 || messages.length > 50) {
+      return new Response(
+        JSON.stringify({ error: "Invalid request: messages must be an array of 1-50 items" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    for (const msg of messages) {
+      if (!msg.role || !["user", "assistant"].includes(msg.role)) {
+        return new Response(
+          JSON.stringify({ error: "Invalid message role" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (typeof msg.content !== "string" || msg.content.length === 0 || msg.content.length > 4000) {
+        return new Response(
+          JSON.stringify({ error: "Each message must be 1-4000 characters" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    const totalChars = messages.reduce((sum: number, m: Message) => sum + m.content.length, 0);
+    if (totalChars > 20000) {
+      return new Response(
+        JSON.stringify({ error: "Total message length exceeds limit" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ========== SUBSCRIPTION CHECK FOR PRO FEATURES ==========
+    if (type === "loan" || type === "bill") {
+      // Whitelisted demo accounts bypass subscription check
+      const email = userData.user.email || "";
+      const whitelisted = ["dhengre.shantanu2000@gmail.com", "test@razorpay.com"].includes(email);
+
+      if (!whitelisted) {
+        const { data: subscription } = await supabase
+          .from("subscriptions")
+          .select("status")
+          .eq("user_id", userId)
+          .eq("status", "active")
+          .maybeSingle();
+
+        if (!subscription) {
+          return new Response(
+            JSON.stringify({ error: "Pro subscription required" }),
+            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      }
+    }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
