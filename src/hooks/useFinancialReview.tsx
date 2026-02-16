@@ -206,70 +206,116 @@ export const useFinancialReview = () => {
   // Calculate financial health score
   const healthScore = useMemo((): FinancialHealthScore => {
     const { currentQuarter } = quarterlyComparison;
+    const hasTransactions = currentQuarter.income > 0 || currentQuarter.expenses > 0;
 
     // Savings score (0-100): Based on savings rate
-    // Ideal: 20%+ = 100, 10-20% = 70-99, 0-10% = 40-69, <0% = 0-39
+    // No income data = 0 (can't assess savings without transactions)
     let savingsScore = 0;
-    if (currentQuarter.savingsRate >= 20) savingsScore = 100;
-    else if (currentQuarter.savingsRate >= 10) savingsScore = 70 + (currentQuarter.savingsRate - 10) * 3;
-    else if (currentQuarter.savingsRate >= 0) savingsScore = 40 + currentQuarter.savingsRate * 3;
-    else savingsScore = Math.max(0, 40 + currentQuarter.savingsRate * 2);
+    if (!hasTransactions) {
+      savingsScore = 0;
+    } else if (currentQuarter.savingsRate >= 20) {
+      savingsScore = 100;
+    } else if (currentQuarter.savingsRate >= 10) {
+      savingsScore = 70 + (currentQuarter.savingsRate - 10) * 3;
+    } else if (currentQuarter.savingsRate >= 0) {
+      savingsScore = 40 + currentQuarter.savingsRate * 3;
+    } else {
+      savingsScore = Math.max(0, 40 + currentQuarter.savingsRate * 2);
+    }
 
     // Budget adherence score (0-100)
-    let budgetScore = 100;
+    // No budgets set = 30 (penalize lack of planning)
+    let budgetScore = 30;
     if (budgets.length > 0) {
+      const totalBudgets = budgets.length;
       const overBudgetCount = budgets.filter((b) => (b.spent || 0) > Number(b.amount)).length;
-      budgetScore = Math.max(0, 100 - (overBudgetCount / budgets.length) * 100);
+      const nearLimitCount = budgets.filter((b) => {
+        const spent = b.spent || 0;
+        const amount = Number(b.amount);
+        return spent >= amount * 0.8 && spent <= amount;
+      }).length;
+      // Deduct for over-budget and slightly for near-limit
+      budgetScore = Math.max(0, 100 - (overBudgetCount / totalBudgets) * 60 - (nearLimitCount / totalBudgets) * 15);
     }
 
     // Debt management score (0-100)
-    // Based on debt-to-income ratio (monthly income to total debt)
+    // No debt and no loans = 100 (genuinely good)
+    // Has debt but no income data = 40
     const monthlyIncome = currentQuarter.income / 3;
     let debtScore = 100;
-    if (monthlyIncome > 0 && totalDebt > 0) {
-      const debtToIncomeRatio = totalDebt / (monthlyIncome * 12);
-      if (debtToIncomeRatio <= 0.3) debtScore = 100;
-      else if (debtToIncomeRatio <= 0.5) debtScore = 80;
-      else if (debtToIncomeRatio <= 1) debtScore = 60;
-      else if (debtToIncomeRatio <= 2) debtScore = 40;
-      else debtScore = 20;
+    if (totalDebt > 0) {
+      if (monthlyIncome <= 0) {
+        debtScore = 40; // Can't properly assess without income
+      } else {
+        const debtToIncomeRatio = totalDebt / (monthlyIncome * 12);
+        if (debtToIncomeRatio <= 0.2) debtScore = 100;
+        else if (debtToIncomeRatio <= 0.4) debtScore = 85;
+        else if (debtToIncomeRatio <= 0.6) debtScore = 70;
+        else if (debtToIncomeRatio <= 1) debtScore = 55;
+        else if (debtToIncomeRatio <= 2) debtScore = 35;
+        else debtScore = 15;
+      }
     }
 
     // Goal progress score (0-100)
-    let goalScore = 100;
+    // No active goals = 30 (penalize lack of goal-setting)
+    let goalScore = 30;
     const activeGoals = goals.filter((g) => g.status === "active");
-    if (activeGoals.length > 0) {
-      const avgProgress = activeGoals.reduce((sum, g) => {
+    const completedGoals = goals.filter((g) => g.status === "completed");
+    if (activeGoals.length > 0 || completedGoals.length > 0) {
+      const allRelevantGoals = [...activeGoals, ...completedGoals];
+      const avgProgress = allRelevantGoals.reduce((sum, g) => {
+        if (g.status === "completed") return sum + 100;
         const progress = (Number(g.current_amount) / Number(g.target_amount)) * 100;
-        return sum + Math.min(100, progress);
-      }, 0) / activeGoals.length;
-      goalScore = avgProgress;
+        // Also factor in time-based expected progress
+        const daysToTarget = Math.ceil((new Date(g.target_date).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        const totalDays = Math.ceil((new Date(g.target_date).getTime() - new Date(g.created_at).getTime()) / (1000 * 60 * 60 * 24));
+        const timeElapsedRatio = totalDays > 0 ? Math.max(0, 1 - daysToTarget / totalDays) : 1;
+        const expectedProgress = timeElapsedRatio * 100;
+        // Score based on actual vs expected progress
+        const progressRatio = expectedProgress > 0 ? Math.min(1.2, progress / expectedProgress) : (progress > 0 ? 1 : 0);
+        return sum + Math.min(100, progressRatio * 100);
+      }, 0) / allRelevantGoals.length;
+      goalScore = Math.round(avgProgress);
     }
 
-    // Cash flow score (0-100): Based on positive vs negative months
-    let cashFlowScore = currentQuarter.savings >= 0 ? 80 : 40;
-    if (quarterlyComparison.changes.savings > 0) cashFlowScore += 20;
+    // Cash flow score (0-100): Based on actual cash flow health
+    let cashFlowScore = 0;
+    if (!hasTransactions) {
+      cashFlowScore = 0;
+    } else {
+      // Base score on savings ratio
+      if (currentQuarter.savings > 0) {
+        const savingsRatio = currentQuarter.savings / currentQuarter.income;
+        cashFlowScore = Math.min(80, savingsRatio * 200); // 40% savings = 80
+      } else {
+        // Negative cash flow
+        cashFlowScore = Math.max(0, 30 + (currentQuarter.savings / currentQuarter.expenses) * 30);
+      }
+      // Bonus for improvement over previous quarter
+      if (quarterlyComparison.changes.savings > 0) cashFlowScore = Math.min(100, cashFlowScore + 20);
+    }
 
     // Overall score (weighted average)
     const overall = Math.round(
       savingsScore * 0.25 +
       budgetScore * 0.2 +
-      debtScore * 0.25 +
+      debtScore * 0.2 +
       goalScore * 0.15 +
-      cashFlowScore * 0.15
+      cashFlowScore * 0.2
     );
 
     // Grade calculation
     let grade: FinancialHealthScore["grade"] = "F";
     let interpretation = "";
-    if (overall >= 95) { grade = "A+"; interpretation = "Exceptional financial health. You're managing money like a pro!"; }
-    else if (overall >= 85) { grade = "A"; interpretation = "Excellent financial health. Keep up the great work!"; }
-    else if (overall >= 80) { grade = "B+"; interpretation = "Very good financial health with room for small improvements."; }
-    else if (overall >= 70) { grade = "B"; interpretation = "Good financial health. Focus on savings and debt reduction."; }
-    else if (overall >= 65) { grade = "C+"; interpretation = "Above average. Some areas need attention."; }
-    else if (overall >= 55) { grade = "C"; interpretation = "Average financial health. Several areas need improvement."; }
-    else if (overall >= 45) { grade = "D"; interpretation = "Below average. Immediate action recommended."; }
-    else { grade = "F"; interpretation = "Critical attention needed. Focus on expense reduction and income growth."; }
+    if (overall >= 90) { grade = "A+"; interpretation = "Exceptional financial health. You're managing money like a pro!"; }
+    else if (overall >= 80) { grade = "A"; interpretation = "Excellent financial health. Keep up the great work!"; }
+    else if (overall >= 72) { grade = "B+"; interpretation = "Very good financial health with room for small improvements."; }
+    else if (overall >= 62) { grade = "B"; interpretation = "Good financial health. Focus on savings and debt reduction."; }
+    else if (overall >= 52) { grade = "C+"; interpretation = "Above average. Some areas need attention."; }
+    else if (overall >= 42) { grade = "C"; interpretation = "Average financial health. Several areas need improvement."; }
+    else if (overall >= 30) { grade = "D"; interpretation = "Below average. Set up budgets and goals to improve your score."; }
+    else { grade = "F"; interpretation = "Insufficient data or critical gaps. Start tracking income, expenses, and set budgets."; }
 
     return {
       overall,
@@ -283,7 +329,7 @@ export const useFinancialReview = () => {
       grade,
       interpretation,
     };
-  }, [quarterlyComparison, budgets, totalDebt, goals]);
+  }, [quarterlyComparison, budgets, totalDebt, goals, now]);
 
   // Identify wins
   const wins = useMemo((): FinancialWin[] => {
