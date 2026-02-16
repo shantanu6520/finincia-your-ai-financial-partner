@@ -98,11 +98,13 @@ async function getOrCreatePlan(planType: 'monthly' | 'annual') {
   return newPlan.id
 }
 
-async function createSubscription(planId: string, customerId: string | null, userEmail: string) {
-  // total_count: 12 is safe for both monthly (1 year) and yearly (12 years, well within Razorpay's 2120 limit)
+async function createSubscription(planId: string, customerId: string | null, userEmail: string, planType: 'monthly' | 'annual') {
+  // Monthly: 100 cycles = ~8.3 years of auto-renewal (Razorpay max)
+  // Annual: 90 cycles = 90 years (stays within Razorpay's 2120 end_time limit)
+  const totalCount = planType === 'monthly' ? 100 : 90
   const subscriptionData: any = {
     plan_id: planId,
-    total_count: 12, // Safe for both monthly (12 months = 1 year) and yearly (12 years)
+    total_count: totalCount,
     quantity: 1,
     customer_notify: 1,
   }
@@ -185,7 +187,7 @@ Deno.serve(async (req) => {
     
     // Create Razorpay subscription (reuse customer ID if available)
     const razorpayCustomerId = existingSub?.razorpay_customer_id || null
-    const razorpaySub = await createSubscription(planId, razorpayCustomerId, userEmail)
+    const razorpaySub = await createSubscription(planId, razorpayCustomerId, userEmail, planType)
 
     // Subscription data for database
     const subscriptionData = {
