@@ -99,9 +99,10 @@ async function getOrCreatePlan(planType: 'monthly' | 'annual') {
 }
 
 async function createSubscription(planId: string, customerId: string | null, userEmail: string) {
+  // total_count: 12 is safe for both monthly (1 year) and yearly (12 years, well within Razorpay's 2120 limit)
   const subscriptionData: any = {
     plan_id: planId,
-    total_count: 100, // Max billing cycles (Razorpay limit)
+    total_count: 12, // Safe for both monthly (12 months = 1 year) and yearly (12 years)
     quantity: 1,
     customer_notify: 1,
   }
