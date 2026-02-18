@@ -1433,6 +1433,50 @@ function analyzeFinancialOverview(context: RequestBody["context"]): string {
     analysis += `🎯 Goals: ${activeGoals.length} active, ${totalProgress}% average progress\n`;
   }
 
+  // Recurring bills analysis
+  if (context.bills && Array.isArray(context.bills) && context.bills.length > 0) {
+    const typedBills = context.bills as Array<{ name: string; amount: number; frequency: string; category?: string; provider?: string; is_negotiated?: boolean; savings_achieved?: number }>;
+    const getMonthly = (b: { amount: number; frequency: string }) => {
+      switch (b.frequency) {
+        case "weekly": return b.amount * 4.33;
+        case "quarterly": return b.amount / 3;
+        case "yearly": return b.amount / 12;
+        default: return b.amount;
+      }
+    };
+    const totalMonthly = typedBills.reduce((sum, b) => sum + getMonthly(b), 0);
+    const totalAnnual = totalMonthly * 12;
+    const negotiated = typedBills.filter(b => b.is_negotiated);
+    const totalSaved = typedBills.reduce((sum, b) => sum + (b.savings_achieved || 0), 0);
+    
+    analysis += `\n🔄 RECURRING BILLS & SUBSCRIPTIONS:\n`;
+    analysis += `- Total monthly recurring: ₹${totalMonthly.toLocaleString("en-IN", { maximumFractionDigits: 0 })}\n`;
+    analysis += `- Total annual recurring: ₹${totalAnnual.toLocaleString("en-IN", { maximumFractionDigits: 0 })}\n`;
+    analysis += `- Active subscriptions/bills: ${typedBills.length}\n`;
+    if (negotiated.length > 0) {
+      analysis += `- Already negotiated: ${negotiated.length} bills, ₹${totalSaved.toLocaleString("en-IN")} saved\n`;
+    }
+    analysis += `- Bill breakdown:\n`;
+    typedBills.forEach(b => {
+      analysis += `  • ${b.name}${b.provider ? ` (${b.provider})` : ''}: ₹${b.amount}/${b.frequency}${b.category ? ` [${b.category}]` : ''}${b.is_negotiated ? ' ✅ negotiated' : ''}\n`;
+    });
+  }
+
+  // Loans analysis  
+  if (context.loans && Array.isArray(context.loans) && context.loans.length > 0) {
+    const typedLoans = context.loans as Array<{ name: string; current_balance: number; interest_rate: number; emi_amount: number; loan_type: string }>;
+    const totalDebt = typedLoans.reduce((sum, l) => sum + (l.current_balance || 0), 0);
+    const totalEmi = typedLoans.reduce((sum, l) => sum + (l.emi_amount || 0), 0);
+    
+    analysis += `\n🏦 LOANS & DEBT:\n`;
+    analysis += `- Total outstanding debt: ₹${totalDebt.toLocaleString("en-IN")}\n`;
+    analysis += `- Total monthly EMIs: ₹${totalEmi.toLocaleString("en-IN")}\n`;
+    analysis += `- Active loans: ${typedLoans.length}\n`;
+    typedLoans.forEach(l => {
+      analysis += `  • ${l.name} (${l.loan_type}): ₹${l.current_balance.toLocaleString("en-IN")} at ${l.interest_rate}%, EMI ₹${l.emi_amount.toLocaleString("en-IN")}\n`;
+    });
+  }
+
   return analysis;
 }
 

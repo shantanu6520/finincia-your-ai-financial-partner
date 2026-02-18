@@ -10,6 +10,8 @@ import { useWallets } from "@/hooks/useWallets";
 import { useTransactions } from "@/hooks/useTransactions";
 import { useBudgets } from "@/hooks/useBudgets";
 import { useGoals } from "@/hooks/useGoals";
+import { useLoans } from "@/hooks/useLoans";
+import { useRecurringBills } from "@/hooks/useRecurringBills";
 import ReactMarkdown from "react-markdown";
 
 const suggestedQuestions = [
@@ -27,6 +29,8 @@ const AICoach = () => {
   const { transactions } = useTransactions();
   const { budgets } = useBudgets();
   const { goals } = useGoals();
+  const { loans } = useLoans();
+  const { bills } = useRecurringBills();
 
   const { messages, isLoading, sendMessage, clearMessages } = useAIChat({
     type: "coach",
@@ -35,6 +39,8 @@ const AICoach = () => {
       transactions: transactions.slice(0, 50),
       budgets,
       goals,
+      loans,
+      bills,
     },
   });
 
