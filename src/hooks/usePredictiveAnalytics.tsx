@@ -698,11 +698,14 @@ export const usePredictiveAnalytics = () => {
       dailyExpenses.push(dayExpense);
     }
     
-    // Calculate fallback values for sparse data
-    const avgDailyExpense = dailyExpenses.reduce((a, b) => a + b, 0) / 30 || totalMonthlyBills / 30 || 0;
-    const avgDailyIncome = dailyIncomes.reduce((a, b) => a + b, 0) / 30 || 0;
+    // Calculate fallback values for sparse data - NO fake numbers
+    const totalExpenseSum = dailyExpenses.reduce((a, b) => a + b, 0);
+    const totalIncomeSum = dailyIncomes.reduce((a, b) => a + b, 0);
+    const avgDailyExpense = totalExpenseSum > 0 ? totalExpenseSum / 30 : (totalMonthlyBills > 0 ? totalMonthlyBills / 30 : 0);
+    const avgDailyIncome = totalIncomeSum > 0 ? totalIncomeSum / 30 : 0;
     const hasEnoughExpenseData = dailyExpenses.filter(e => e > 0).length >= 7;
     const hasEnoughIncomeData = dailyIncomes.filter(i => i > 0).length >= 3;
+    const hasAnyData = totalExpenseSum > 0 || totalIncomeSum > 0 || totalMonthlyBills > 0;
     
     // Apply Holt-Winters for expense forecasting (with fallback)
     const expenseModel = hasEnoughExpenseData
@@ -1084,13 +1087,17 @@ export const usePredictiveAnalytics = () => {
       });
     }
 
-    // Calculate average daily expense for fallback
-    const avgDailyExpense = dailyExpenses.length > 0 
-      ? dailyExpenses.reduce((a, b) => a + b, 0) / dailyExpenses.length 
+    // Calculate average daily expense - NO fallback to fake values
+    const totalDailyExpense = dailyExpenses.reduce((a, b) => a + b, 0);
+    const avgDailyExpense = totalDailyExpense > 0 
+      ? totalDailyExpense / dailyExpenses.length 
       : totalMonthlyBills / 30;
     
-    // Use fallback if no expenses recorded
-    const baseForecastValue = avgDailyExpense > 0 ? avgDailyExpense : (totalMonthlyBills / 30) || 500;
+    // If no expenses and no recurring bills, forecast is 0 (not a fake number)
+    const baseForecastValue = avgDailyExpense > 0 ? avgDailyExpense : 0;
+    
+    // If there's truly no data, return only historical zeros with no forecast
+    const hasAnyExpenseData = totalDailyExpense > 0 || totalMonthlyBills > 0;
 
     // Apply Holt-Winters for smarter forecast (with fallback for sparse data)
     const hasEnoughData = dailyExpenses.filter(e => e > 0).length >= 7;
@@ -1103,34 +1110,36 @@ export const usePredictiveAnalytics = () => {
     // Add the last actual value as bridge point for smooth transition
     const lastActualValue = data[data.length - 1]?.actual || baseForecastValue;
     
-    // Forecast (next 30 days)
-    for (let i = 1; i <= 30; i++) {
-      const date = addDays(now, i);
-      const dayOfWeek = i % 7;
-      
-      const seasonal = model.seasonal[dayOfWeek] || 1;
-      let forecast = (model.level + model.trend * i) * seasonal;
-      
-      // Ensure forecast is reasonable (not zero or negative when we have data)
-      if (forecast <= 0 && baseForecastValue > 0) {
-        forecast = baseForecastValue * seasonal;
+    // Forecast (next 30 days) — only if there's actual data
+    if (hasAnyExpenseData) {
+      for (let i = 1; i <= 30; i++) {
+        const date = addDays(now, i);
+        const dayOfWeek = i % 7;
+        
+        const seasonal = model.seasonal[dayOfWeek] || 1;
+        let forecast = (model.level + model.trend * i) * seasonal;
+        
+        // Ensure forecast is reasonable (not zero or negative when we have data)
+        if (forecast <= 0 && baseForecastValue > 0) {
+          forecast = baseForecastValue * seasonal;
+        }
+        
+        // Smooth transition from last actual value for first few days
+        if (i <= 3) {
+          const blendRatio = i / 4;
+          forecast = lastActualValue * (1 - blendRatio) + forecast * blendRatio;
+        }
+        
+        // Confidence bands
+        const confidenceWidth = baseVolatility * Math.sqrt(i) * 0.5;
+        
+        data.push({
+          date: format(date, "dd MMM"),
+          forecast: Math.max(0, forecast),
+          confidenceLow: Math.max(0, forecast - confidenceWidth),
+          confidenceHigh: forecast + confidenceWidth,
+        });
       }
-      
-      // Smooth transition from last actual value for first few days
-      if (i <= 3) {
-        const blendRatio = i / 4;
-        forecast = lastActualValue * (1 - blendRatio) + forecast * blendRatio;
-      }
-      
-      // Confidence bands
-      const confidenceWidth = baseVolatility * Math.sqrt(i) * 0.5;
-      
-      data.push({
-        date: format(date, "dd MMM"),
-        forecast: Math.max(0, forecast),
-        confidenceLow: Math.max(0, forecast - confidenceWidth),
-        confidenceHigh: forecast + confidenceWidth,
-      });
     }
 
     return data;
