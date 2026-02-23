@@ -33,17 +33,6 @@ const HeroSection = () => {
 
   const [current, setCurrent] = useState(0);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrent((c) => {
-        const next = (c + 1) % screenshots.length;
-        scrollPillIntoView(next);
-        return next;
-      });
-    }, 4000);
-    return () => clearInterval(timer);
-  }, [scrollPillIntoView]);
-
   return (
     <section className="relative min-h-screen bg-hero overflow-hidden">
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:80px_80px]" />
