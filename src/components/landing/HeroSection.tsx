@@ -156,12 +156,12 @@ const HeroSection = () => {
             </div>
 
             {/* Navigation pills */}
-            <div className="flex justify-center gap-2 mt-8">
+            <div className="flex justify-start md:justify-center gap-2 mt-8 overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0">
               {screenshots.map((s, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrent(i)}
-                  className={`px-4 py-2 rounded-full text-xs font-medium tracking-wide transition-all duration-300 border backdrop-blur-sm ${
+                  className={`px-4 py-2 rounded-full text-xs font-medium tracking-wide transition-all duration-300 border backdrop-blur-sm whitespace-nowrap shrink-0 ${
                     i === current
                       ? 'bg-primary-foreground text-primary border-primary-foreground shadow-[0_0_20px_rgba(255,255,255,0.15)]'
                       : 'bg-white/5 text-primary-foreground/40 border-white/10 hover:bg-white/10 hover:text-primary-foreground/70'
