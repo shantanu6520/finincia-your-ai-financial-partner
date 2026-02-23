@@ -71,7 +71,7 @@ const FeaturesSection = () => {
           </p>
         </motion.div>
 
-        <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
@@ -79,7 +79,7 @@ const FeaturesSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.05 }}
-              className={`group relative rounded-lg p-6 transition-all duration-300 snap-start shrink-0 w-[280px] md:w-auto ${
+              className={`group relative rounded-lg p-6 transition-all duration-300 ${
                 feature.highlight 
                   ? 'bg-primary text-primary-foreground md:col-span-2' 
                   : 'bg-card border border-border hover:border-foreground/20'
