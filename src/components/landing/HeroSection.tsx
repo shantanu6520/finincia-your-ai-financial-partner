@@ -1,9 +1,8 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, TrendingUp, Shield, Brain } from "lucide-react";
+import { ArrowRight, ArrowLeft, TrendingUp, Shield, Brain, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useRef, useCallback } from "react";
-import { useState, useEffect } from "react";
+import { useRef, useCallback, useState, useEffect } from "react";
 import screenshotDashboard from "@/assets/screenshots/dashboard.png";
 import screenshotAnalytics from "@/assets/screenshots/analytics.png";
 import screenshotReports from "@/assets/screenshots/reports.png";
@@ -23,15 +22,53 @@ const screenshots = [
 const HeroSection = () => {
   const pillsRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [current, setCurrent] = useState(0);
 
   const scrollPillIntoView = useCallback((index: number) => {
     const btn = buttonRefs.current[index];
-    if (btn) {
-      btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    const container = pillsRef.current;
+    if (btn && container) {
+      const btnLeft = btn.offsetLeft;
+      const btnWidth = btn.offsetWidth;
+      const containerWidth = container.offsetWidth;
+      const scrollTarget = btnLeft - containerWidth / 2 + btnWidth / 2;
+      container.scrollTo({ left: scrollTarget, behavior: 'smooth' });
     }
   }, []);
 
-  const [current, setCurrent] = useState(0);
+  const goTo = useCallback((index: number) => {
+    setCurrent(index);
+    scrollPillIntoView(index);
+  }, [scrollPillIntoView]);
+
+  const goPrev = useCallback(() => {
+    goTo((current - 1 + screenshots.length) % screenshots.length);
+  }, [current, goTo]);
+
+  const goNext = useCallback(() => {
+    goTo((current + 1) % screenshots.length);
+  }, [current, goTo]);
+
+  // Auto-rotation
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent((c) => {
+        const next = (c + 1) % screenshots.length;
+        // Scroll pill into view without moving the page
+        const btn = buttonRefs.current[next];
+        const container = pillsRef.current;
+        if (btn && container) {
+          const btnLeft = btn.offsetLeft;
+          const btnWidth = btn.offsetWidth;
+          const containerWidth = container.offsetWidth;
+          const scrollTarget = btnLeft - containerWidth / 2 + btnWidth / 2;
+          container.scrollTo({ left: scrollTarget, behavior: 'smooth' });
+        }
+        return next;
+      });
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <section className="relative min-h-screen bg-hero overflow-hidden">
@@ -161,13 +198,29 @@ const HeroSection = () => {
               </div>
             </div>
 
+            {/* Arrow buttons */}
+            <button
+              onClick={goPrev}
+              className="absolute left-0 md:-left-14 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm flex items-center justify-center text-primary-foreground/70 hover:bg-white/20 hover:text-primary-foreground transition-all"
+              aria-label="Previous screenshot"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={goNext}
+              className="absolute right-0 md:-right-14 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm flex items-center justify-center text-primary-foreground/70 hover:bg-white/20 hover:text-primary-foreground transition-all"
+              aria-label="Next screenshot"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+
             {/* Navigation pills */}
             <div ref={pillsRef} className="flex justify-start md:justify-center gap-2 mt-8 overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0">
               {screenshots.map((s, i) => (
                 <button
                   key={i}
                   ref={(el) => { buttonRefs.current[i] = el; }}
-                  onClick={() => { setCurrent(i); scrollPillIntoView(i); }}
+                  onClick={() => goTo(i)}
                   className={`px-4 py-2 rounded-full text-xs font-medium tracking-wide transition-all duration-300 border backdrop-blur-sm whitespace-nowrap shrink-0 ${
                     i === current
                       ? 'bg-primary-foreground text-primary border-primary-foreground shadow-[0_0_20px_rgba(255,255,255,0.15)]'
