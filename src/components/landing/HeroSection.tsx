@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, TrendingUp, Shield, Brain } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useRef, useCallback } from "react";
 import { useState, useEffect } from "react";
 import screenshotDashboard from "@/assets/screenshots/dashboard.png";
 import screenshotAnalytics from "@/assets/screenshots/analytics.png";
@@ -20,12 +21,28 @@ const screenshots = [
 ];
 
 const HeroSection = () => {
+  const pillsRef = useRef<HTMLDivElement>(null);
+  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const scrollPillIntoView = useCallback((index: number) => {
+    const btn = buttonRefs.current[index];
+    if (btn) {
+      btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }, []);
+
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrent((c) => (c + 1) % screenshots.length), 4000);
+    const timer = setInterval(() => {
+      setCurrent((c) => {
+        const next = (c + 1) % screenshots.length;
+        scrollPillIntoView(next);
+        return next;
+      });
+    }, 4000);
     return () => clearInterval(timer);
-  }, []);
+  }, [scrollPillIntoView]);
 
   return (
     <section className="relative min-h-screen bg-hero overflow-hidden">
@@ -156,11 +173,12 @@ const HeroSection = () => {
             </div>
 
             {/* Navigation pills */}
-            <div className="flex justify-start md:justify-center gap-2 mt-8 overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0">
+            <div ref={pillsRef} className="flex justify-start md:justify-center gap-2 mt-8 overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0">
               {screenshots.map((s, i) => (
                 <button
                   key={i}
-                  onClick={() => setCurrent(i)}
+                  ref={(el) => { buttonRefs.current[i] = el; }}
+                  onClick={() => { setCurrent(i); scrollPillIntoView(i); }}
                   className={`px-4 py-2 rounded-full text-xs font-medium tracking-wide transition-all duration-300 border backdrop-blur-sm whitespace-nowrap shrink-0 ${
                     i === current
                       ? 'bg-primary-foreground text-primary border-primary-foreground shadow-[0_0_20px_rgba(255,255,255,0.15)]'
